@@ -348,6 +348,7 @@
     <p class="sec-sub">最新の動画</p>
     <div class="yt-tabs">
       <button class="yt-tab on" data-yt="videos">動画</button>
+      <button class="yt-tab" data-yt="utatte">歌ってみた</button>
       <button class="yt-tab" data-yt="lives">ライブ</button>
       <button class="yt-tab" data-yt="shorts">ショート</button>
     </div>
@@ -473,7 +474,7 @@ async function loadWorks(){
 }
 
 // YouTube データ保持
-const ytData={videos:[],lives:[],shorts:[]};
+const ytData={videos:[],utatte:[],lives:[],shorts:[]};
 
 function makeYtCard(item){
   const dt=new Date(item.published||item.snippet?.publishedAt);
@@ -508,9 +509,10 @@ async function loadYT(){
     const d=await r.json();
     if(!d.items?.length)throw new Error('no items');
 
-    ytData.videos=d.items.filter(i=>i.tab==='videos').slice(0,10);
-    ytData.lives =d.items.filter(i=>i.tab==='lives').slice(0,10);
-    ytData.shorts=d.items.filter(i=>i.tab==='shorts').slice(0,10);
+    ytData.videos =d.items.filter(i=>i.tab==='videos').slice(0,10);
+    ytData.utatte =d.items.filter(i=>i.tab==='utatte').slice(0,10);
+    ytData.lives  =d.items.filter(i=>i.tab==='lives').slice(0,10);
+    ytData.shorts =d.items.filter(i=>i.tab==='shorts').slice(0,10);
     renderYT('videos');
   }catch(e){
     console.error('YouTube load error:',e);
