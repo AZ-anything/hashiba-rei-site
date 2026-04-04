@@ -11,7 +11,7 @@ CH  = "UCn3tBA3UvmDtB_0LyKEG-hA"
 r = requests.get(
     "https://www.googleapis.com/youtube/v3/search",
     params={"key": KEY, "channelId": CH, "part": "snippet",
-            "order": "date", "maxResults": 20, "type": "video"},
+            "order": "date", "maxResults": 50, "type": "video"},
     timeout=15
 )
 d = r.json()
