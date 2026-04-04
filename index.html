@@ -440,7 +440,7 @@ function loadMoreWorks(){
 
 async function loadWorks(){
   try{
-    const r=await fetch('works.json?_='+Date.now());
+    const r=await fetch('https://raw.githubusercontent.com/magnusironwood/hashiba-rei-site/main/works.json?_='+Date.now());
     if(!r.ok)throw 0;
     const d=await r.json();
     allWorks=d.works||[];
