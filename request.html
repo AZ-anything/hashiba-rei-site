@@ -73,7 +73,34 @@
     .info-body{font-size:.85rem;color:var(--text-sub);line-height:1.9;}
     .info-body strong{color:var(--text);font-weight:500;}
 
-    /* ── CONTACT ── */
+    /* ── CALCULATOR ── */
+    .calc-wrap{background:var(--white);border:1.5px solid var(--green-border);border-radius:var(--radius);padding:2rem;margin-top:2rem;}
+    .calc-toggle{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.8rem;background:var(--cream-deep);border-radius:30px;padding:.3rem;}
+    .calc-toggle-btn{padding:.6rem;border:none;border-radius:30px;background:transparent;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;letter-spacing:.05em;color:var(--text-sub);cursor:pointer;transition:all var(--ease);text-align:center;}
+    .calc-toggle-btn.on{background:var(--green);color:#fff;box-shadow:0 2px 8px rgba(60,100,65,.2);}
+    .calc-fields{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+    .calc-field label{display:block;font-size:.72rem;letter-spacing:.1em;color:var(--text-muted);margin-bottom:.4rem;}
+    .calc-field input{
+      width:100%;padding:.7rem 1rem;
+      border:1.5px solid var(--green-border);border-radius:var(--radius-sm);
+      background:var(--cream);font-family:'Noto Sans JP',sans-serif;
+      font-size:1.1rem;color:var(--text);outline:none;
+      transition:border-color var(--ease);-webkit-appearance:none;
+    }
+    .calc-field input:focus{border-color:var(--green);background:var(--white);}
+    .calc-field input::placeholder{color:var(--text-muted);font-size:.9rem;}
+    .calc-result{background:linear-gradient(135deg,var(--green-light),var(--cream));border-radius:var(--radius-sm);padding:1.4rem 1.6rem;}
+    .calc-result-row{display:flex;justify-content:space-between;align-items:baseline;padding:.4rem 0;}
+    .calc-result-row+.calc-result-row{border-top:1px solid var(--green-border);}
+    .calc-result-label{font-size:.78rem;color:var(--text-sub);}
+    .calc-result-val{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;color:var(--text);}
+    .calc-result-val.tax-in{color:var(--green);font-size:2.2rem;}
+    .calc-result-val span{font-family:'Noto Sans JP',sans-serif;font-size:.72rem;color:var(--text-muted);margin-left:.3rem;}
+    .calc-note{font-size:.72rem;color:var(--text-muted);margin-top:.8rem;line-height:1.7;}
+    @media(max-width:600px){
+      .calc-fields{grid-template-columns:1fr;}
+      .calc-result-val.tax-in{font-size:1.8rem;}
+    }
     .contact-box{background:linear-gradient(135deg,var(--green-light),var(--yellow-light));border:1px solid var(--green-border);border-radius:var(--radius);padding:2.2rem;text-align:center;}
     .contact-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;letter-spacing:.15em;color:var(--green);margin-bottom:.6rem;}
     .contact-body{font-size:.83rem;color:var(--text-sub);line-height:1.9;margin-bottom:1.4rem;}
@@ -204,6 +231,49 @@
   </div>
 </section>
 
+<!-- お見積もり計算機 -->
+<section class="sec" style="padding-top:0">
+  <div class="wrap">
+    <h2 class="sec-title">お見積もり計算</h2>
+
+    <div class="calc-wrap">
+      <!-- バイノーラル / モノラル 切替 -->
+      <div class="calc-toggle">
+        <button class="calc-toggle-btn on" id="btn-bi" onclick="setMode('bi')">Binaural（バイノーラル）</button>
+        <button class="calc-toggle-btn" id="btn-mono" onclick="setMode('mono')">Monaural（モノラル）</button>
+      </div>
+
+      <!-- 入力フィールド -->
+      <div class="calc-fields">
+        <div class="calc-field">
+          <label>台本の文字数（三点リーダ・句読点除く）</label>
+          <input type="number" id="input-chars" placeholder="例：3000" min="0" oninput="calc()">
+        </div>
+        <div class="calc-field">
+          <label>アドリブ音の秒数</label>
+          <input type="number" id="input-secs" placeholder="例：30" min="0" oninput="calc()">
+        </div>
+      </div>
+
+      <!-- 結果 -->
+      <div class="calc-result">
+        <div class="calc-result-row">
+          <span class="calc-result-label">税別</span>
+          <span class="calc-result-val" id="result-ex">―<span>円</span></span>
+        </div>
+        <div class="calc-result-row">
+          <span class="calc-result-label">税込（10%）</span>
+          <span class="calc-result-val tax-in" id="result-in">―<span>円</span></span>
+        </div>
+      </div>
+      <p class="calc-note">
+        ※ 文字数のカウントは依頼主様にてお願いしております。<br>
+        ※ こちらはあくまでも目安です。詳細はお問い合わせ時にご確認ください。
+      </p>
+    </div>
+  </div>
+</section>
+
 <!-- お問い合わせ -->
 <section class="sec" style="padding-top:0;padding-bottom:4rem">
   <div class="wrap">
@@ -227,5 +297,38 @@
   <a href="/">hashiba-rei.netlify.app</a> &nbsp;|&nbsp; © 2025 Hashiba Rei
 </footer>
 
-</body>
+<script>
+const RATES = {
+  bi:   { char: 10, sec: 30 },
+  mono: { char:  8, sec: 24 },
+};
+let mode = 'bi';
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-bi').classList.toggle('on',   m === 'bi');
+  document.getElementById('btn-mono').classList.toggle('on', m === 'mono');
+  calc();
+}
+
+function calc() {
+  const chars = parseInt(document.getElementById('input-chars').value) || 0;
+  const secs  = parseInt(document.getElementById('input-secs').value)  || 0;
+  const r     = RATES[mode];
+
+  if (chars === 0 && secs === 0) {
+    document.getElementById('result-ex').innerHTML = '―<span>円</span>';
+    document.getElementById('result-in').innerHTML = '―<span>円</span>';
+    return;
+  }
+
+  const ex = chars * r.char + secs * r.sec;
+  const inn = Math.floor(ex * 1.1);
+
+  document.getElementById('result-ex').innerHTML =
+    ex.toLocaleString() + '<span>円</span>';
+  document.getElementById('result-in').innerHTML =
+    inn.toLocaleString() + '<span>円</span>';
+}
+</script>
 </html>
