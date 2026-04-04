@@ -23,7 +23,8 @@ if "error" in d:
 items = []
 for item in d.get("items", []):
     t = item["snippet"]["title"]
-    if   re.search(r"#[Ss]horts|#ショート", t): tab = "shorts"
+    if   re.search(r"歌ってみた|歌って みた", t):       tab = "utatte"
+    elif re.search(r"#[Ss]horts|#ショート",       t):       tab = "shorts"
     elif re.search(r"配信|雑談|ライブ|LIVE",  t): tab = "lives"
     else:                                          tab = "videos"
 
