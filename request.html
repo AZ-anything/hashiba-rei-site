@@ -102,7 +102,9 @@
     }
     .calc-field input:focus{border-color:var(--green);background:var(--white);}
     .calc-field input::placeholder{color:var(--text-muted);font-size:.9rem;}
-    .calc-result{background:linear-gradient(135deg,var(--green-light),var(--cream));border-radius:var(--radius-sm);padding:1.4rem 1.6rem;}
+    .calc-breakdown{margin-bottom:.6rem;padding-bottom:.6rem;border-bottom:1px dashed var(--green-border);display:none;}
+    .calc-breakdown-row{display:flex;justify-content:space-between;align-items:baseline;padding:.2rem 0;font-size:.78rem;color:var(--text-sub);}
+    .calc-breakdown-val{font-family:'Noto Sans JP',sans-serif;font-weight:500;color:var(--text-sub);}background:linear-gradient(135deg,var(--green-light),var(--cream));border-radius:var(--radius-sm);padding:1.4rem 1.6rem;}
     .calc-result-row{display:flex;justify-content:space-between;align-items:baseline;padding:.4rem 0;}
     .calc-result-row+.calc-result-row{border-top:1px solid var(--green-border);}
     .calc-result-label{font-size:.78rem;color:var(--text-sub);}
@@ -270,12 +272,13 @@
 
       <!-- 結果 -->
       <div class="calc-result">
+        <div class="calc-breakdown" id="calc-breakdown"></div>
         <div class="calc-result-row">
-          <span class="calc-result-label">税別</span>
+          <span class="calc-result-label">税別合計</span>
           <span class="calc-result-val" id="result-ex">―<span>円</span></span>
         </div>
         <div class="calc-result-row">
-          <span class="calc-result-label">税込（10%）</span>
+          <span class="calc-result-label">税込合計（10%）</span>
           <span class="calc-result-val tax-in" id="result-in">―<span>円</span></span>
         </div>
       </div>
@@ -329,19 +332,37 @@ function calc() {
   const secs  = parseInt(document.getElementById('input-secs').value)  || 0;
   const r     = RATES[mode];
 
+  const breakdown = document.getElementById('calc-breakdown');
+
   if (chars === 0 && secs === 0) {
     document.getElementById('result-ex').innerHTML = '―<span>円</span>';
     document.getElementById('result-in').innerHTML = '―<span>円</span>';
+    breakdown.style.display = 'none';
     return;
   }
 
-  const ex = chars * r.char + secs * r.sec;
-  const inn = Math.floor(ex * 1.1);
+  const charAmt = chars * r.char;
+  const secAmt  = secs  * r.sec;
+  const ex      = charAmt + secAmt;
+  const inn     = Math.floor(ex * 1.1);
 
-  document.getElementById('result-ex').innerHTML =
-    ex.toLocaleString() + '<span>円</span>';
-  document.getElementById('result-in').innerHTML =
-    inn.toLocaleString() + '<span>円</span>';
+  // 内訳
+  let rows = '';
+  if (chars > 0) rows += `
+    <div class="calc-breakdown-row">
+      <span>台本 ${chars.toLocaleString()}文字 × ¥${r.char}</span>
+      <span class="calc-breakdown-val">${charAmt.toLocaleString()}円</span>
+    </div>`;
+  if (secs > 0) rows += `
+    <div class="calc-breakdown-row">
+      <span>アドリブ ${secs.toLocaleString()}秒 × ¥${r.sec}</span>
+      <span class="calc-breakdown-val">${secAmt.toLocaleString()}円</span>
+    </div>`;
+  breakdown.innerHTML = rows;
+  breakdown.style.display = 'block';
+
+  document.getElementById('result-ex').innerHTML = ex.toLocaleString()  + '<span>円</span>';
+  document.getElementById('result-in').innerHTML = inn.toLocaleString() + '<span>円</span>';
 }
 </script>
 </html>
