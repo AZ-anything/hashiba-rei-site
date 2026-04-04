@@ -476,18 +476,17 @@ async function loadWorks(){
 const ytData={videos:[],lives:[],shorts:[]};
 
 function makeYtCard(item){
-  const vid=item.id.videoId||item.id;
-  const sn=item.snippet;
-  const dt=new Date(sn.publishedAt);
+  const dt=new Date(item.published||item.snippet?.publishedAt);
   const ds=`${dt.getFullYear()}/${dt.getMonth()+1}/${dt.getDate()}`;
-  const thumb=sn.thumbnails?.medium?.url||sn.thumbnails?.default?.url||'';
-  const link=`https://www.youtube.com/watch?v=${vid}`;
+  const thumb=item.thumbnail||item.snippet?.thumbnails?.medium?.url||'';
+  const link=item.link||`https://www.youtube.com/watch?v=${item.id?.videoId||item.id}`;
+  const title=item.title||item.snippet?.title||'';
   return`<a class="yt-card" href="${link}" target="_blank" rel="noopener">
     <div class="yt-thumb-wrap">
-      ${thumb?`<img class="yt-thumb" src="${thumb}" alt="${sn.title}" loading="lazy">`:''}
+      ${thumb?`<img class="yt-thumb" src="${thumb}" alt="${title}" loading="lazy">`:''}
       <div class="yt-overlay"><div class="yt-play"><svg width="16" height="16" viewBox="0 0 24 24" fill="#333"><polygon points="5,3 19,12 5,21"/></svg></div></div>
     </div>
-    <div class="yt-body"><p class="yt-title">${sn.title}</p><p class="yt-date">${ds}</p></div>
+    <div class="yt-body"><p class="yt-title">${title}</p><p class="yt-date">${ds}</p></div>
   </a>`;
 }
 
@@ -502,29 +501,19 @@ function renderYT(type){
 
 async function loadYT(){
   const g=document.getElementById('yt-grid');
-  const KEY='AIzaSyCmyjJ3a0Q9NxKg-g7kpwrTVLkcgxdyHpM';
   g.innerHTML='<div class="empty"><div class="dots"><span></span><span></span><span></span></div></div>';
   try{
-    // APIコール1回のみ（100ユニット）
-    const r=await fetch(`https://www.googleapis.com/youtube/v3/search?key=${KEY}&channelId=${YT_CH}&part=snippet&order=date&maxResults=20&type=video`);
+    const r=await fetch('https://raw.githubusercontent.com/magnusironwood/hashiba-rei-site/main/youtube.json?_='+Date.now());
+    if(!r.ok)throw new Error('fetch failed');
     const d=await r.json();
-    if(!d.items?.length)throw new Error(d.error?.message||'no items');
+    if(!d.items?.length)throw new Error('no items');
 
-    // タイトルで分類（追加APIコールなし）
-    ytData.videos=[];ytData.lives=[];ytData.shorts=[];
-    for(const item of d.items){
-      const t=item.snippet.title;
-      if(/#[Ss]horts|#ショート/.test(t)){
-        ytData.shorts.push(item);
-      }else if(/配信|雑談|ライブ|LIVE/.test(t)){
-        ytData.lives.push(item);
-      }else{
-        ytData.videos.push(item);
-      }
-    }
+    ytData.videos=d.items.filter(i=>i.tab==='videos');
+    ytData.lives =d.items.filter(i=>i.tab==='lives');
+    ytData.shorts=d.items.filter(i=>i.tab==='shorts');
     renderYT('videos');
   }catch(e){
-    console.error('YouTube API error:',e);
+    console.error('YouTube load error:',e);
     g.innerHTML=`<div class="empty">動画の読み込みに失敗しました。<a href="https://www.youtube.com/channel/${YT_CH}" target="_blank" rel="noopener" style="color:var(--green)">YouTubeチャンネルはこちら</a></div>`;
   }
 }
