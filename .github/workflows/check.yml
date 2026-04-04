@@ -3,13 +3,13 @@ name: 発売チェック・自動更新
 on:
   schedule:
     - cron: "10 15 * * *"   # 毎日 0:10 JST（= UTC 15:10）
-  workflow_dispatch:        # 手動実行ボタンあり
+  workflow_dispatch:
 
 jobs:
   check:
     runs-on: ubuntu-latest
     permissions:
-      contents: write       # works.json をコミットするために必要
+      contents: write
 
     steps:
       - name: チェックアウト
@@ -21,7 +21,7 @@ jobs:
           python-version: "3.11"
 
       - name: 依存ライブラリ
-        run: pip install requests
+        run: pip install requests beautifulsoup4 lxml
 
       - name: 発売チェック実行
         run: python check_releases.py
@@ -32,6 +32,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add works.json
           git diff --staged --quiet && echo "変更なし" || (
-            git commit -m "chore: 発売ステータス自動更新 $(date -u '+%Y-%m-%d')"
+            git commit -m "chore: 発売ステータス・発売時期 自動更新 $(date -u '+%Y-%m-%d')"
             git push
           )
