@@ -461,14 +461,8 @@ async function loadWorks(){
 // YouTube データ保持
 const ytData={videos:[],lives:[],shorts:[]};
 
-function parseDuration(d){
-  const m=d?.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if(!m)return 0;
-  return(parseInt(m[1]||0)*3600)+(parseInt(m[2]||0)*60)+parseInt(m[3]||0);
-}
-
 function makeYtCard(item){
-  const vid=item.id;
+  const vid=item.id.videoId||item.id;
   const sn=item.snippet;
   const dt=new Date(sn.publishedAt);
   const ds=`${dt.getFullYear()}/${dt.getMonth()+1}/${dt.getDate()}`;
@@ -497,34 +491,23 @@ async function loadYT(){
   const KEY='AIzaSyCmyjJ3a0Q9NxKg-g7kpwrTVLkcgxdyHpM';
   g.innerHTML='<div class="empty"><div class="dots"><span></span><span></span><span></span></div></div>';
   try{
-    // 1. 直近20件を検索
-    const s1=await fetch(`https://www.googleapis.com/youtube/v3/search?key=${KEY}&channelId=${YT_CH}&part=snippet&order=date&maxResults=20&type=video`);
-    const d1=await s1.json();
-    if(!d1.items?.length)throw new Error(d1.error?.message||'no items');
+    // APIコール1回のみ（100ユニット）
+    const r=await fetch(`https://www.googleapis.com/youtube/v3/search?key=${KEY}&channelId=${YT_CH}&part=snippet&order=date&maxResults=20&type=video`);
+    const d=await r.json();
+    if(!d.items?.length)throw new Error(d.error?.message||'no items');
 
-    // 2. 動画の詳細（duration取得）
-    const ids=d1.items.map(i=>i.id.videoId).join(',');
-    const s2=await fetch(`https://www.googleapis.com/youtube/v3/videos?key=${KEY}&id=${ids}&part=contentDetails,snippet`);
-    const d2=await s2.json();
-
-    // 3. 過去のライブ配信を取得
-    const s3=await fetch(`https://www.googleapis.com/youtube/v3/search?key=${KEY}&channelId=${YT_CH}&part=snippet&order=date&maxResults=8&type=video&eventType=completed`);
-    const d3=await s3.json();
-    const liveIds=new Set((d3.items||[]).map(i=>i.id.videoId));
-
-    // 4. 分類
+    // タイトルで分類（追加APIコールなし）
     ytData.videos=[];ytData.lives=[];ytData.shorts=[];
-    for(const item of(d2.items||[])){
-      const dur=parseDuration(item.contentDetails?.duration);
-      if(liveIds.has(item.id)){
-        ytData.lives.push(item);
-      }else if(dur>0&&dur<=60){
+    for(const item of d.items){
+      const t=item.snippet.title;
+      if(/#[Ss]horts|#ショート/.test(t)){
         ytData.shorts.push(item);
+      }else if(/配信|雑談|ライブ|LIVE/.test(t)){
+        ytData.lives.push(item);
       }else{
         ytData.videos.push(item);
       }
     }
-
     renderYT('videos');
   }catch(e){
     console.error('YouTube API error:',e);
