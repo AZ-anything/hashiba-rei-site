@@ -508,9 +508,9 @@ async function loadYT(){
     const d=await r.json();
     if(!d.items?.length)throw new Error('no items');
 
-    ytData.videos=d.items.filter(i=>i.tab==='videos');
-    ytData.lives =d.items.filter(i=>i.tab==='lives');
-    ytData.shorts=d.items.filter(i=>i.tab==='shorts');
+    ytData.videos=d.items.filter(i=>i.tab==='videos').slice(0,10);
+    ytData.lives =d.items.filter(i=>i.tab==='lives').slice(0,10);
+    ytData.shorts=d.items.filter(i=>i.tab==='shorts').slice(0,10);
     renderYT('videos');
   }catch(e){
     console.error('YouTube load error:',e);
