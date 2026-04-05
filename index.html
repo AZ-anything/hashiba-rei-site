@@ -74,6 +74,8 @@
     .pickup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:1.1rem;}
     .p-card{background:var(--white);border:1px solid var(--yellow-border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);transition:all var(--ease);}
     .p-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+    .p-card.p-card-new{border:2px solid #FF4D6D;box-shadow:0 0 0 1px rgba(255,77,109,.15);}
+    .p-card.p-card-new:hover{box-shadow:0 6px 20px rgba(255,77,109,.2);}
     .p-card-img{aspect-ratio:4/3;object-fit:cover;width:100%;}
     .p-card-ph{aspect-ratio:4/3;background:linear-gradient(135deg,var(--green-light),var(--yellow-light));display:flex;align-items:center;justify-content:center;font-size:2.2rem;}
     .p-card-body{padding:1rem;flex:1;display:flex;flex-direction:column;}
@@ -87,6 +89,8 @@
     .badge-yellow{background:var(--yellow-light);color:var(--yellow);border:1px solid var(--yellow-border);}
     .badge-orange{background:#FFF0E8;color:#C06A30;border:1px solid #F0C0A0;}
     .badge-green{background:var(--green-light);color:var(--green);border:1px solid var(--green-border);}
+    .badge-new{background:#FF4D6D;color:#fff;border:none;font-weight:700;letter-spacing:.14em;animation:pulse-new 2s ease-in-out infinite;}
+    @keyframes pulse-new{0%,100%{box-shadow:0 0 0 0 rgba(255,77,109,.4);}50%{box-shadow:0 0 0 5px rgba(255,77,109,0);}}
 
     /* ─── SEARCH ─── */
     .search-wrap{position:relative;margin-bottom:1.4rem;}
@@ -259,7 +263,7 @@
       <div>
         <p class="p-name-en fu fu1">Hashiba Rei</p>
         <p class="p-name-ja fu fu1">羽 柴 礼</p>
-        <span class="p-badge fu fu2">18禁声優 / Voice Actress</span>
+        <span class="p-badge fu fu2">18禁声優 / Voice Actor</span>
         <p class="p-bio fu fu2">
           ひょんなことから18禁声優になった人です。<br>
           主に喘いだりはぁはぁしてるので18歳未満の方は数年後にまたお会いしましょう。<br>
@@ -392,11 +396,16 @@ function renderPickup(works){
   const list=works.filter(w=>['announced','upcoming','preorder'].includes(w.status)||(w.status==='released'&&isNew(w.date)));
   const g=document.getElementById('pickup-grid');
   if(!list.length){g.innerHTML='<div class="empty">現在ピックアップ作品はありません</div>';return;}
-  g.innerHTML=list.map(w=>`
-    <a class="p-card" href="${w.url}" target="_blank" rel="noopener">
+  g.innerHTML=list.map(w=>{
+    const isNewRelease=w.status==='released'&&isNew(w.date);
+    const badgeCls=isNewRelease?'badge-new':stCls(w.status);
+    const badgeLabel=isNewRelease?'✦ NEW':stLabel(w.status);
+    const cardCls=isNewRelease?'p-card p-card-new':'p-card';
+    return`
+    <a class="${cardCls}" href="${w.url}" target="_blank" rel="noopener">
       ${coverHtml(w,'p-card-img','p-card-ph')}
       <div class="p-card-body">
-        <span class="badge ${stCls(w.status)}">${stLabel(w.status)}</span>
+        <span class="badge ${badgeCls}">${badgeLabel}</span>
         <p class="p-card-title">${w.title}</p>
         <p class="p-card-circle">${w.circle}</p>
         <p class="p-card-date">${
@@ -406,7 +415,7 @@ function renderPickup(works){
         }</p>
         <span class="p-card-btn">DLsiteで見る</span>
       </div>
-    </a>`).join('');
+    </a>`;}).join('');
 }
 
 let allWorks=[];
@@ -417,8 +426,8 @@ const INIT=10, MORE=30;
 function getFiltered(f){
   if(f==='released') return allWorks.filter(w=>w.status==='released');
   if(f==='upcoming') return allWorks.filter(w=>['announced','upcoming','preorder'].includes(w.status));
-  if(f==='own')      return allWorks.filter(w=>w.is_own);
-  if(f==='other')    return allWorks.filter(w=>!w.is_own);
+  if(f==='own')      return allWorks.filter(w=>w.circle==='はねしば');
+  if(f==='other')    return allWorks.filter(w=>w.circle!=='はねしば');
   return allWorks;
 }
 
