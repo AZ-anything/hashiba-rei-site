@@ -4,6 +4,7 @@ GitHub Actions から毎日 0:10 JST に実行。
 
 ・発売済みになっていたら status を released に更新
 ・発売予定時期が空の作品はDLsiteから自動取得して補完
+・発売検知時はDLsiteの販売ページから正確な発売日を取得
 """
 
 import requests, json, re, time
@@ -59,6 +60,35 @@ def _parse_date_text(raw: str) -> tuple[str, str]:
     return (raw, "")
 
 
+# ─── 実際の発売日をDLsite販売ページから取得 ──────────────────
+
+def get_actual_release_date(product_id: str) -> str:
+    """
+    DLsite販売ページの作品概要テーブルから正確な発売日を取得。
+    Returns: ISO形式 "YYYY-MM-DD"、取得できなければ ""
+    """
+    for domain in ["girls", "girls-drama", "maniax"]:
+        url = f"https://www.dlsite.com/{domain}/work/=/product_id/{product_id}.html"
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=15)
+            if r.status_code != 200:
+                continue
+            soup = BeautifulSoup(r.text, "lxml")
+            table = soup.find("table", id="work_outline")
+            if table:
+                for tr in table.find_all("tr"):
+                    th = tr.find("th")
+                    td = tr.find("td")
+                    if th and td and "販売日" in th.text:
+                        m = re.search(r"(\d{4})年(\d{2})月(\d{2})日", td.text)
+                        if m:
+                            return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+        except Exception as e:
+            print(f"  [発売日取得エラー] {domain}: {e}")
+        time.sleep(0.5)
+    return ""
+
+
 # ─── 発売チェック ─────────────────────────────────────────────
 
 def extract_product_id(url: str) -> str | None:
@@ -101,10 +131,17 @@ def main():
         # ① 発売チェック
         if is_released(pid):
             print(f"  ✅ 発売済みに変更")
-            w["status"]       = "released"
-            w["release_date"] = today
-            w["date"]         = today
-            w["url"]          = f"https://www.dlsite.com/girls/work/=/product_id/{pid}.html"
+            w["status"] = "released"
+            w["url"]    = f"https://www.dlsite.com/girls/work/=/product_id/{pid}.html"
+
+            # DLsiteから正確な発売日を取得（取得できなければ今日の日付をフォールバック）
+            actual_date = get_actual_release_date(pid)
+            w["date"] = actual_date if actual_date else today
+            if actual_date:
+                print(f"  📅 発売日取得: {actual_date}")
+            else:
+                print(f"  📅 発売日取得失敗 → 今日の日付で代替: {today}")
+
             changed = True
             time.sleep(1)
             continue
@@ -125,6 +162,12 @@ def main():
         time.sleep(1)
 
     if changed:
+        # released作品を発売日新しい順に並び替え
+        released_dated   = [w for w in works if w["status"] == "released" and w.get("date")]
+        released_undated = [w for w in works if w["status"] == "released" and not w.get("date")]
+        announced        = [w for w in works if w["status"] != "released"]
+        data["works"] = announced + sorted(released_dated, key=lambda x: x["date"], reverse=True) + released_undated
+
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         with open("works.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
