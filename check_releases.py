@@ -62,10 +62,10 @@ def _parse_date_text(raw: str) -> tuple[str, str]:
 
 # ─── 実際の発売日をDLsite販売ページから取得 ──────────────────
 
-def get_actual_release_date(product_id: str) -> str:
+def get_actual_release_date(product_id: str) -> tuple[str, list]:
     """
-    DLsite販売ページの作品概要テーブルから正確な発売日を取得。
-    Returns: ISO形式 "YYYY-MM-DD"、取得できなければ ""
+    DLsite販売ページの作品概要テーブルから正確な発売日とジャンルを取得。
+    Returns: (ISO形式 "YYYY-MM-DD", ジャンルリスト)、取得できなければ ("", [])
     """
     for domain in ["girls", "girls-drama", "maniax"]:
         url = f"https://www.dlsite.com/{domain}/work/=/product_id/{product_id}.html"
@@ -75,18 +75,26 @@ def get_actual_release_date(product_id: str) -> str:
                 continue
             soup = BeautifulSoup(r.text, "lxml")
             table = soup.find("table", id="work_outline")
+            date_str = ""
+            genres = []
             if table:
                 for tr in table.find_all("tr"):
                     th = tr.find("th")
                     td = tr.find("td")
-                    if th and td and "販売日" in th.text:
+                    if not th or not td:
+                        continue
+                    if "販売日" in th.text:
                         m = re.search(r"(\d{4})年(\d{2})月(\d{2})日", td.text)
                         if m:
-                            return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+                            date_str = f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+                    if "ジャンル" in th.text:
+                        genres = [a.text.strip() for a in td.find_all("a")]
+            if date_str:
+                return (date_str, genres)
         except Exception as e:
             print(f"  [発売日取得エラー] {domain}: {e}")
         time.sleep(0.5)
-    return ""
+    return ("", [])
 
 
 # ─── 発売チェック ─────────────────────────────────────────────
@@ -134,13 +142,16 @@ def main():
             w["status"] = "released"
             w["url"]    = f"https://www.dlsite.com/girls/work/=/product_id/{pid}.html"
 
-            # DLsiteから正確な発売日を取得（取得できなければ今日の日付をフォールバック）
-            actual_date = get_actual_release_date(pid)
+            # DLsiteから正確な発売日とジャンルを取得
+            actual_date, genres = get_actual_release_date(pid)
             w["date"] = actual_date if actual_date else today
+            w["genres"] = genres
             if actual_date:
                 print(f"  📅 発売日取得: {actual_date}")
             else:
                 print(f"  📅 発売日取得失敗 → 今日の日付で代替: {today}")
+            if genres:
+                print(f"  🏷️ ジャンル取得: {genres}")
 
             changed = True
             time.sleep(1)
