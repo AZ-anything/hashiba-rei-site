@@ -442,7 +442,7 @@ function buildGenreTags(){
   // 出現数上位30件を表示
   const top = Object.entries(counter)
     .sort((a,b)=>b[1]-a[1])
-    .slice(0,30)
+    .slice(0,15)
     .map(([g])=>g);
 
   const section = document.getElementById('genre-section');
