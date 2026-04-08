@@ -143,6 +143,11 @@
     .works-more{text-align:center;margin-top:2rem;}
     .works-more-btn{display:inline-block;padding:.65rem 2.2rem;border:1.5px solid var(--green);border-radius:30px;font-family:'Noto Sans JP',sans-serif;font-size:.8rem;letter-spacing:.1em;color:var(--green);background:transparent;cursor:pointer;transition:all var(--ease);}
     .works-more-btn:hover{background:var(--green);color:#fff;}
+    .genre-section{margin:.6rem 0 1.4rem;}
+    .genre-label{font-size:.68rem;color:var(--text-muted);letter-spacing:.08em;margin-bottom:.5rem;}
+    .genre-tags{display:flex;flex-wrap:wrap;gap:.4rem;}
+    .genre-tag{display:inline-block;padding:.2rem .7rem;border:1px solid var(--green-border);border-radius:20px;font-size:.68rem;color:var(--text-sub);cursor:pointer;transition:all var(--ease);background:transparent;}
+    .genre-tag:hover,.genre-tag.on{background:var(--green);border-color:var(--green);color:#fff;}
     .works-count{font-size:.72rem;color:var(--text-muted);margin-top:.6rem;}
 
     #youtube{background:var(--cream-deep);padding:5rem 0;}
@@ -325,7 +330,7 @@
     <!-- 検索バー -->
     <div class="search-wrap">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input class="search-input" id="search-input" type="search" placeholder="タイトル・サークル名で検索…" autocomplete="off">
+      <input class="search-input" id="search-input" type="search" placeholder="タイトル・サークル名・ジャンルで検索…" autocomplete="off">
       <svg class="search-clear" id="search-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       <div class="suggest-list" id="suggest-list"></div>
     </div>
@@ -335,6 +340,10 @@
       <button class="fbtn" data-f="upcoming">予告・近日発売</button>
       <button class="fbtn" data-f="own">はねしば</button>
       <button class="fbtn" data-f="other">他サークル出演</button>
+    </div>
+    <div class="genre-section" id="genre-section" style="display:none">
+      <p class="genre-label">ジャンル・タグで絞り込む</p>
+      <div class="genre-tags" id="genre-tags"></div>
     </div>
     <div class="works-grid" id="works-grid">
       <div class="empty"><div class="dots"><span></span><span></span><span></span></div></div>
@@ -423,12 +432,51 @@ let currentFilter='all';
 let displayCount=10;
 const INIT=10, MORE=30;
 
+let currentGenre = '';
+
+function buildGenreTags(){
+  const counter = {};
+  allWorks.forEach(w=>{
+    (w.genres||[]).forEach(g=>{ counter[g]=(counter[g]||0)+1; });
+  });
+  // 出現数上位30件を表示
+  const top = Object.entries(counter)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,30)
+    .map(([g])=>g);
+
+  const section = document.getElementById('genre-section');
+  const container = document.getElementById('genre-tags');
+  if(!top.length){ section.style.display='none'; return; }
+  container.innerHTML = top.map(g=>
+    `<span class="genre-tag" data-g="${g}">${g}</span>`
+  ).join('');
+  section.style.display='block';
+
+  container.querySelectorAll('.genre-tag').forEach(t=>{
+    t.addEventListener('click', ()=>{
+      const g = t.dataset.g;
+      if(currentGenre === g){
+        currentGenre = '';
+        t.classList.remove('on');
+      } else {
+        currentGenre = g;
+        container.querySelectorAll('.genre-tag').forEach(x=>x.classList.remove('on'));
+        t.classList.add('on');
+      }
+      renderWorks(currentFilter, true);
+    });
+  });
+}
+
 function getFiltered(f){
-  if(f==='released') return allWorks.filter(w=>w.status==='released');
-  if(f==='upcoming') return allWorks.filter(w=>['announced','upcoming','preorder'].includes(w.status));
-  if(f==='own')      return allWorks.filter(w=>w.circle==='はねしば');
-  if(f==='other')    return allWorks.filter(w=>w.circle!=='はねしば');
-  return allWorks;
+  let list = allWorks;
+  if(f==='released') list = list.filter(w=>w.status==='released');
+  else if(f==='upcoming') list = list.filter(w=>['announced','upcoming','preorder'].includes(w.status));
+  else if(f==='own')  list = list.filter(w=>w.circle==='はねしば');
+  else if(f==='other') list = list.filter(w=>w.circle!=='はねしば');
+  if(currentGenre) list = list.filter(w=>(w.genres||[]).includes(currentGenre));
+  return list;
 }
 
 function renderWorks(f='all', reset=true){
@@ -464,22 +512,23 @@ function loadMoreWorks(){
 
 async function loadWorks(){
   try{
-    const r=await fetch('https://raw.githubusercontent.com/AZ-anything/hashiba-rei-site/main/works.json?_='+Date.now());
+    const r=await fetch('https://raw.githubusercontent.com/AZ-anything/hashiba-rei-site/main/works.json',{cache:'no-store'});
     if(!r.ok)throw 0;
     const d=await r.json();
     allWorks=d.works||[];
     if(d.updated_at){
       const dt=new Date(d.updated_at);
-      // UTCからJSTへ（+9時間）
-      dt.setHours(dt.getHours()+9);
+      // toLocaleStringでJSTに変換
+      const jst=new Date(dt.getTime()+9*60*60*1000);
       document.getElementById('works-meta').textContent=
-        `${dt.getFullYear()}/${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')} JST 更新`;
+        `${jst.getUTCFullYear()}/${jst.getUTCMonth()+1}/${jst.getUTCDate()} ${String(jst.getUTCHours()).padStart(2,'0')}:${String(jst.getUTCMinutes()).padStart(2,'0')} JST 更新`;
     }
   }catch(e){
     allWorks=[{title:'ヤバ男図鑑',circle:'はねしば',url:'https://www.dlsite.com/girls/circle/profile/=/maker_id/RG64228.html',cover:'',date:'',status:'upcoming',is_own:true}];
   }
   renderPickup(allWorks);
   renderWorks('all');
+  buildGenreTags();
 }
 
 // YouTube データ保持
@@ -576,7 +625,8 @@ function setupSearch(){
     const qL = q.toLowerCase();
     const hits = allWorks.filter(w=>
       w.title.toLowerCase().includes(qL) ||
-      w.circle.toLowerCase().includes(qL)
+      w.circle.toLowerCase().includes(qL) ||
+      (w.genres||[]).some(g=>g.toLowerCase().includes(qL))
     );
 
     // サジェストドロップダウン（最大8件）
@@ -626,7 +676,9 @@ document.querySelectorAll('.fbtn').forEach(b=>{
   b.addEventListener('click',()=>{
     document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('on'));
     b.classList.add('on');
-    renderWorks(b.dataset.f, true); // reset=true でページリセット
+    currentGenre = '';
+    document.querySelectorAll('.genre-tag').forEach(x=>x.classList.remove('on'));
+    renderWorks(b.dataset.f, true);
   });
 });
 document.querySelectorAll('.reveal').forEach(el=>{
