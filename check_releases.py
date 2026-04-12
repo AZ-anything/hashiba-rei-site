@@ -105,7 +105,7 @@ def extract_product_id(url: str) -> str | None:
 
 
 def is_released(product_id: str) -> bool:
-    for domain in ["girls", "girls-drama"]:
+    for domain in ["girls", "girls-drama", "girls-touch", "girls-drama-touch", "maniax"]:
         url = f"https://www.dlsite.com/{domain}/work/=/product_id/{product_id}.html"
         try:
             r = requests.head(url, headers=HEADERS, timeout=10, allow_redirects=True)
