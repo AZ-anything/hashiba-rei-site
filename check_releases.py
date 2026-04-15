@@ -157,17 +157,28 @@ def main():
             time.sleep(1)
             continue
 
-        # ② 発売時期が未設定なら自動取得
-        if "/announce/" in w["url"] and not w.get("release_period", ""):
+        # ② 発売時期の取得・更新（未設定 or 曖昧→具体日付への変更を検知）
+        if "/announce/" in w["url"]:
+            old_period = w.get("release_period", "")
+            old_date   = w.get("date", "")
             period, date = get_release_period(w["url"])
-            if period:
+
+            if not old_period and period:
+                # 新規取得
                 print(f"  📅 発売時期を取得: {period}")
                 w["release_period"] = period
                 changed = True
-            if date and not w.get("date", ""):
+            elif old_period and period and period != old_period:
+                # 変更検知（例: "5月" → "5月15日"）
+                print(f"  📅 発売時期が更新: {old_period} → {period}")
+                w["release_period"] = period
+                changed = True
+
+            if date and date != old_date:
+                print(f"  📅 発売日が確定: {date}")
                 w["date"] = date
                 changed = True
-            if not period:
+            elif not period and not old_period:
                 print(f"     発売時期：DLsite未記載")
 
         time.sleep(1)
