@@ -1,6 +1,14 @@
 {
-  "updated_at": "2026-04-29T16:51:08.871207+00:00",
+  "updated_at": "2026-04-30T16:44:04.338962+00:00",
   "items": [
+    {
+      "id": "iJfL7Ezc6T0",
+      "title": "【羽柴礼】セレナーデ歌ってみた",
+      "published": "2026-04-30T15:36:41Z",
+      "thumbnail": "https://i.ytimg.com/vi/iJfL7Ezc6T0/mqdefault.jpg",
+      "link": "https://www.youtube.com/watch?v=iJfL7Ezc6T0",
+      "tab": "utatte"
+    },
     {
       "id": "WYwszZNbFPw",
       "title": "【羽柴礼】アンノウン・マザーグース歌ってみた",
@@ -391,14 +399,6 @@
       "published": "2024-08-08T10:40:25Z",
       "thumbnail": "https://i.ytimg.com/vi/T69tz4cAI-U/mqdefault.jpg",
       "link": "https://www.youtube.com/watch?v=T69tz4cAI-U",
-      "tab": "videos"
-    },
-    {
-      "id": "L6a_VoP8DrI",
-      "title": "【ホグワーツレガシー】お友達１００人計画 #2",
-      "published": "2024-08-08T10:21:12Z",
-      "thumbnail": "https://i.ytimg.com/vi/L6a_VoP8DrI/mqdefault.jpg",
-      "link": "https://www.youtube.com/watch?v=L6a_VoP8DrI",
       "tab": "videos"
     }
   ]
