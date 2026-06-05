@@ -84,6 +84,11 @@
     .p-card-date{font-size:.7rem;color:var(--text-sub);margin-top:.3rem;}
     .p-card-btn{display:block;margin-top:.85rem;padding:.48rem;text-align:center;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:.73rem;letter-spacing:.08em;transition:background var(--ease);}
     .p-card-btn:hover{background:var(--green-mid);}
+    .card-btns{display:flex;gap:.45rem;margin-top:.85rem;}
+    .card-btns .p-card-btn{flex:1;margin-top:0;}
+    .w-card-btns{display:flex;gap:.4rem;margin-top:.65rem;}
+    .w-card-btn{flex:1;display:block;padding:.4rem .2rem;text-align:center;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:.65rem;letter-spacing:.05em;transition:background var(--ease);}
+    .w-card-btn:hover{background:var(--green-mid);}
 
     .badge{display:inline-block;padding:.17rem .58rem;border-radius:3px;font-size:.67rem;letter-spacing:.07em;font-weight:500;margin-bottom:.48rem;}
     .badge-yellow{background:var(--yellow-light);color:var(--yellow);border:1px solid var(--yellow-border);}
@@ -425,7 +430,7 @@ function renderPickup(works){
     const badgeLabel=isNewRelease?'✦ NEW':stLabel(w.status);
     const cardCls=isNewRelease?'p-card p-card-new':'p-card';
     return`
-    <a class="${cardCls}" href="${w.url}" target="_blank" rel="noopener">
+    <div class="${cardCls}">
       ${coverHtml(w,'p-card-img','p-card-ph')}
       <div class="p-card-body">
         <span class="badge ${badgeCls}">${badgeLabel}</span>
@@ -436,9 +441,9 @@ function renderPickup(works){
           w.status==='announced' ? '発売日未定' :
           w.date ? '発売日：'+fmtDate(w.date) : ''
         }</p>
-        <span class="p-card-btn">${siteName(w.url)}で見る</span>
+        ${storeButtons(w, 'p-card-btn', 'card-btns')}
       </div>
-    </a>`;}).join('');
+    </div>`;}).join('');
 }
 
 let allWorks=[];
@@ -656,20 +661,29 @@ function siteName(url){
   return 'ストア';
 }
 
+function storeButtons(w, btnCls, wrapCls){
+  const links = [w.url, w.url2].filter(Boolean);
+  const label = u => links.length > 1 ? siteName(u) : siteName(u) + 'で見る';
+  return `<div class="${wrapCls}">` + links.map(u =>
+    `<a class="${btnCls}" href="${u}" target="_blank" rel="noopener">${label(u)}</a>`
+  ).join('') + `</div>`;
+}
+
 function makeWorkCard(w){
   const imgHtml = w.cover
     ? `<img class="w-card-img" src="${w.cover}" alt="${w.title}" loading="lazy"
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
        <div class="w-card-ph" style="display:none">🎧</div>`
     : `<div class="w-card-ph">🎧</div>`;
-  return `<a class="w-card" href="${w.url}" target="_blank" rel="noopener">
+  return `<div class="w-card">
     ${imgHtml}
     <div class="w-card-body">
       <span class="badge ${stCls(w.status)}" style="margin-bottom:.38rem">${stLabel(w.status)}</span>
       <p class="w-card-title">${w.title}</p>
       <p class="w-card-circle">${w.circle}</p>
+      ${storeButtons(w, 'w-card-btn', 'w-card-btns')}
     </div>
-  </a>`;
+  </div>`;
 }
 
 function setupSearch(){
