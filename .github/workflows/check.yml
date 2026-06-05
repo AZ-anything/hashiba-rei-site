@@ -23,6 +23,9 @@ jobs:
         run: python fetch_youtube.py
 
       - name: 発売チェック実行
+        env:
+          DMM_API_ID: ${{ secrets.DMM_API_ID }}
+          DMM_AFFILIATE_ID: ${{ secrets.DMM_AFFILIATE_ID }}
         run: python check_releases.py
 
       - name: 変更があればコミット・プッシュ
