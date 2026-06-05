@@ -1,0 +1,43 @@
+name: 作品追加
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "作品URL（DLsite または らぶカル）"
+        required: true
+        type: string
+
+jobs:
+  add:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 依存ライブラリ
+        run: pip install requests beautifulsoup4 lxml
+
+      - name: 作品情報取得・works.json更新
+        run: python add_work.py "${{ inputs.url }}"
+
+      - name: 取得HTMLをartifactに保存（パーサ調整用）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fetched-page
+          path: fetched_page.html
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: 変更があればコミット・プッシュ
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add works.json
+          git diff --staged --quiet && echo "変更なし" || (
+            git commit -m "feat: 作品追加 (add_work.py) $(date -u '+%Y-%m-%d')"
+            git push
+          )
