@@ -1,8 +1,0 @@
-name: api-test
-on: workflow_dispatch
-jobs:
-  t:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          curl -s -w "\nHTTP %{http_code}\n" "https://api.dmm.com/affiliate/v3/ItemList?api_id=dummy&affiliate_id=dummy-990&site=FANZA&service=doujin&floor=digital_doujin&cid=d_775012&output=json" | head -c 1000
