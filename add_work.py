@@ -5,28 +5,18 @@ GitHub Actions の workflow_dispatch から URL を渡して実行する。
   python add_work.py <作品URL>
 
 ・DLsite (dlsite.com): 販売ページ/告知ページからタイトル・サークル・カバー・発売日・ジャンルを取得
-・らぶカル (lovecul.dmm.co.jp): 作品詳細ページから同粒度の情報を取得
+・らぶカル (lovecul.dmm.co.jp): DMMアフィリエイトAPIで同粒度の情報を取得
+  （ページ直接取得は海外IPブロックのため不可。要 DMM_API_ID / DMM_AFFILIATE_ID）
 ・works.json に追加（URL重複チェックあり）して保存
-・取得したHTMLは fetched_page.html に保存される（パーサ調整用にartifactへ）
 """
 
-import sys, json, re, time
+import os, sys, json, re, time
 from datetime import datetime, timezone
 
 import requests
 from bs4 import BeautifulSoup
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-COOKIES = {"age_check_done": "1", "ckcy": "1", "cklg": "ja"}  # DMM系年齢確認スキップ
-
-
-def fetch(url: str) -> str:
-    r = requests.get(url, headers=HEADERS, cookies=COOKIES, timeout=30)
-    r.raise_for_status()
-    r.encoding = r.apparent_encoding or "utf-8"
-    with open("fetched_page.html", "w", encoding="utf-8") as f:
-        f.write(r.text)
-    return r.text
 
 
 def date_to_period(iso: str) -> str:
@@ -136,7 +126,7 @@ def _parse_date_text(raw: str):
     return (raw, "")
 
 
-# ─── らぶカル ────────────────────────────────────────────────
+# ─── らぶカル（DMMアフィリエイトAPI） ─────────────────────────
 
 def parse_lovecul(url: str) -> dict:
     m = re.search(r"cid=([a-zA-Z0-9_]+)", url)
@@ -145,113 +135,40 @@ def parse_lovecul(url: str) -> dict:
     cid = m.group(1)
     canonical = f"https://lovecul.dmm.co.jp/tl/-/detail/=/cid={cid}/"
 
-    html = fetch(url)
-    soup = BeautifulSoup(html, "lxml")
+    api_id = os.environ.get("DMM_API_ID", "")
+    aff_id = os.environ.get("DMM_AFFILIATE_ID", "")
+    if not api_id or not aff_id:
+        raise ValueError("DMM_API_ID / DMM_AFFILIATE_ID が未設定です（GitHub Secretsに登録してください）")
 
-    work = {"title": "", "circle": "", "url": canonical, "cover": "",
-            "date": "", "status": "released", "release_period": "", "genres": []}
+    r = requests.get("https://api.dmm.com/affiliate/v3/ItemList", params={
+        "api_id": api_id, "affiliate_id": aff_id,
+        "site": "FANZA", "service": "doujin", "floor": "digital_doujin",
+        "cid": cid, "output": "json",
+    }, timeout=15)
+    result = r.json().get("result", {})
+    items = result.get("items", [])
+    if not items:
+        raise ValueError(
+            f"DMM APIに {cid} が未掲載です（発売前の予告段階の可能性）。"
+            "タイトル・サークル名・発売予定日をチャットで教えてください。"
+        )
+    item = items[0]
 
-    # ① JSON-LD
-    for sc in soup.find_all("script", type="application/ld+json"):
-        try:
-            data = json.loads(sc.string or "")
-        except Exception:
-            continue
-        items = data if isinstance(data, list) else [data]
-        for d in items:
-            if not isinstance(d, dict):
-                continue
-            if d.get("@type") in ("Product", "CreativeWork", "Book"):
-                work["title"] = work["title"] or d.get("name", "")
-                img = d.get("image", "")
-                work["cover"] = work["cover"] or (img[0] if isinstance(img, list) else img)
-                brand = d.get("brand", {})
-                if isinstance(brand, dict):
-                    work["circle"] = work["circle"] or brand.get("name", "")
-                rd = d.get("releaseDate", "") or d.get("datePublished", "")
-                if rd:
-                    work["date"] = work["date"] or rd[:10]
+    date_str = item.get("date", "")[:10].replace("/", "-")
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    genres = [g["name"] for g in item.get("iteminfo", {}).get("genre", [])]
+    makers = item.get("iteminfo", {}).get("maker", [])
 
-    # ② Next.js / Nuxt 埋め込みJSONから探索
-    state_script = soup.find("script", id="__NEXT_DATA__")
-    if state_script and state_script.string:
-        try:
-            state = json.loads(state_script.string)
-            _walk_state(state, work)
-        except Exception:
-            pass
-
-    # ③ メタタグ fallback
-    if not work["title"]:
-        og = soup.find("meta", property="og:title")
-        if og:
-            work["title"] = re.sub(r"\s*[\|｜-]\s*らぶカル.*$", "", og["content"]).strip()
-    if not work["cover"]:
-        og = soup.find("meta", property="og:image")
-        if og:
-            work["cover"] = og["content"]
-
-    # ④ DOM探索（dt/dd, th/td）
-    for label, key in [("サークル", "circle"), ("ブランド", "circle"), ("メーカー", "circle"),
-                       ("配信開始日", "date"), ("発売日", "date"), ("商品発売日", "date")]:
-        if work[key]:
-            continue
-        for el in soup.find_all(["th", "dt", "span", "div"], string=re.compile(label)):
-            sib = el.find_next_sibling()
-            if sib:
-                raw = sib.get_text(strip=True)
-                if key == "date":
-                    dm = re.search(r"(\d{4})[/年.-](\d{1,2})[/月.-](\d{1,2})", raw)
-                    if dm:
-                        work["date"] = f"{dm.group(1)}-{int(dm.group(2)):02d}-{int(dm.group(3)):02d}"
-                        break
-                else:
-                    if raw:
-                        work[key] = raw
-                        break
-
-    # ⑤ ジャンル（ジャンル/タグへのリンク）
-    if not work["genres"]:
-        genres = []
-        for a in soup.find_all("a", href=re.compile(r"(genre|keyword|article)")):
-            t = a.get_text(strip=True)
-            if t and len(t) <= 12 and t not in genres:
-                genres.append(t)
-        work["genres"] = genres[:15]
-
-    if work["date"]:
-        work["release_period"] = date_to_period(work["date"])
-        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        work["status"] = "released" if work["date"] <= today else "announced"
-
-    if not work["title"]:
-        raise ValueError("らぶカルページからタイトルを取得できませんでした（fetched_page.htmlを確認）")
-    return work
-
-
-def _walk_state(node, work, depth=0):
-    """埋め込みJSONを再帰探索して該当キーを拾う"""
-    if depth > 12:
-        return
-    if isinstance(node, dict):
-        for k, v in node.items():
-            kl = k.lower()
-            if isinstance(v, str) and v:
-                if not work["title"] and kl in ("title", "productname", "contentname"):
-                    work["title"] = v
-                elif not work["circle"] and kl in ("makername", "circlename", "brandname", "authorname"):
-                    work["circle"] = v
-                elif not work["date"] and kl in ("deliverystartdate", "releasedate", "salesstartdate", "begin"):
-                    dm = re.search(r"(\d{4})[/-](\d{1,2})[/-](\d{1,2})", v)
-                    if dm:
-                        work["date"] = f"{dm.group(1)}-{int(dm.group(2)):02d}-{int(dm.group(3)):02d}"
-                elif not work["cover"] and kl in ("packageimageurl", "mainimage", "packageurl") and v.startswith("http"):
-                    work["cover"] = v
-            else:
-                _walk_state(v, work, depth + 1)
-    elif isinstance(node, list):
-        for v in node:
-            _walk_state(v, work, depth + 1)
+    return {
+        "title": item.get("title", ""),
+        "circle": makers[0]["name"] if makers else "",
+        "url": canonical,
+        "cover": item.get("imageURL", {}).get("large", ""),
+        "date": date_str,
+        "status": "released" if (date_str and date_str <= today) else "announced",
+        "release_period": date_to_period(date_str),
+        "genres": genres,
+    }
 
 
 # ─── メイン ──────────────────────────────────────────────────
