@@ -21,6 +21,9 @@ jobs:
         run: pip install requests beautifulsoup4 lxml
 
       - name: 作品情報取得・works.json更新
+        env:
+          DMM_API_ID: ${{ secrets.DMM_API_ID }}
+          DMM_AFFILIATE_ID: ${{ secrets.DMM_AFFILIATE_ID }}
         run: python add_work.py "${{ inputs.url }}"
 
       - name: 取得HTMLをartifactに保存（パーサ調整用）
