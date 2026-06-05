@@ -5,13 +5,70 @@ GitHub Actions から毎日 0:10 JST に実行。
 ・発売済みになっていたら status を released に更新
 ・発売予定時期が空の作品はDLsiteから自動取得して補完
 ・発売検知時はDLsiteの販売ページから正確な発売日を取得
+・らぶカル作品（lovecul.dmm.co.jp）はDMMアフィリエイトAPIで発売チェック
 """
 
-import requests, json, re, time
+import os, requests, json, re, time
 from bs4 import BeautifulSoup
 from datetime import datetime, timezone
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+
+
+# ─── らぶカル（DMMアフィリエイトAPI） ─────────────────────────
+
+def extract_cid(url: str) -> str | None:
+    m = re.search(r"cid=([a-zA-Z0-9_]+)", url)
+    return m.group(1) if m else None
+
+
+def dmm_api_lookup(cid: str) -> dict | None:
+    """DMMアフィリエイトAPIで作品情報を取得。未掲載（予告段階）ならNone"""
+    api_id = os.environ.get("DMM_API_ID", "")
+    aff_id = os.environ.get("DMM_AFFILIATE_ID", "")
+    if not api_id or not aff_id:
+        print("  ⚠️ DMM_API_ID / DMM_AFFILIATE_ID が未設定（らぶカルチェックをスキップ）")
+        return None
+    try:
+        r = requests.get("https://api.dmm.com/affiliate/v3/ItemList", params={
+            "api_id": api_id, "affiliate_id": aff_id,
+            "site": "FANZA", "service": "doujin", "floor": "digital_doujin",
+            "cid": cid, "output": "json",
+        }, timeout=15)
+        items = r.json().get("result", {}).get("items", [])
+        return items[0] if items else None
+    except Exception as e:
+        print(f"  [DMM APIエラー] {e}")
+        return None
+
+
+def check_lovecul(w: dict, today: str) -> bool:
+    """らぶカル作品の発売チェック。変更があればTrue"""
+    cid = extract_cid(w["url"])
+    if not cid:
+        return False
+    item = dmm_api_lookup(cid)
+    if not item:
+        print("     DMM API未掲載（予告段階）")
+        return False
+
+    date_str = item.get("date", "")[:10].replace("/", "-")
+    if date_str and date_str <= today:
+        print(f"  ✅ 発売済みに変更（らぶカル）")
+        w["status"] = "released"
+        w["date"] = date_str
+        m = re.match(r"\d{4}-(\d{2})-(\d{2})", date_str)
+        if m:
+            w["release_period"] = f"{int(m.group(1))}月{int(m.group(2))}日"
+        genres = [g["name"] for g in item.get("iteminfo", {}).get("genre", [])]
+        if genres:
+            w["genres"] = genres
+        img = item.get("imageURL", {}).get("large", "")
+        if img:
+            w["cover"] = img
+        print(f"  📅 発売日: {date_str} / 🏷️ ジャンル: {genres}")
+        return True
+    return False
 
 
 # ─── 発売予定時期の取得 ───────────────────────────────────────
@@ -130,6 +187,14 @@ def main():
     print(f"チェック対象: {len(pending)} 件")
 
     for w in pending:
+        # らぶカル作品はDMM APIでチェック
+        if "lovecul.dmm.co.jp" in w["url"]:
+            print(f"\n  [らぶカル {extract_cid(w['url'])}] {w['title'][:35]}")
+            if check_lovecul(w, today):
+                changed = True
+            time.sleep(1)
+            continue
+
         pid = extract_product_id(w["url"])
         if not pid:
             continue
