@@ -436,7 +436,7 @@ function renderPickup(works){
           w.status==='announced' ? '発売日未定' :
           w.date ? '発売日：'+fmtDate(w.date) : ''
         }</p>
-        <span class="p-card-btn">DLsiteで見る</span>
+        <span class="p-card-btn">${siteName(w.url)}で見る</span>
       </div>
     </a>`;}).join('');
 }
@@ -648,6 +648,12 @@ function highlightMatch(text, q){
   return text.slice(0,idx)
     + `<mark>${text.slice(idx,idx+q.length)}</mark>`
     + text.slice(idx+q.length);
+}
+
+function siteName(url){
+  if(url.includes('lovecul.dmm.co.jp')) return 'らぶカル';
+  if(url.includes('dlsite.com')) return 'DLsite';
+  return 'ストア';
 }
 
 function makeWorkCard(w){
