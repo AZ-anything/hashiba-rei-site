@@ -72,7 +72,7 @@
     .pickup-head{display:flex;align-items:center;gap:.9rem;margin-bottom:1.8rem;}
     .pickup-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.28rem .85rem;background:var(--yellow);color:#fff;border-radius:4px;font-size:.7rem;font-weight:500;letter-spacing:.12em;}
     .pickup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:1.1rem;}
-    .p-card{background:var(--white);border:1px solid var(--yellow-border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);transition:all var(--ease);}
+    .p-card{background:var(--white);border:1px solid var(--yellow-border);border-radius:var(--radius);position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);transition:all var(--ease);}
     .p-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
     .p-card.p-card-new{border:2px solid #FF4D6D;box-shadow:0 0 0 1px rgba(255,77,109,.15);}
     .p-card.p-card-new:hover{box-shadow:0 6px 20px rgba(255,77,109,.2);}
@@ -452,8 +452,10 @@ function renderPickup(works){
     const badgeCls=isNewRelease?'badge-new':stCls(w.status);
     const badgeLabel=isNewRelease?'✦ NEW':stLabel(w.status);
     const cardCls=isNewRelease?'p-card p-card-new':'p-card';
+    const ribbon = w.on_sale ? '<span class="sale-ribbon">SALE</span>' : '';
     return`
     <div class="${cardCls}">
+      ${ribbon}
       ${coverHtml(w,'p-card-img','p-card-ph')}
       <div class="p-card-body">
         <span class="badge ${badgeCls}">${badgeLabel}</span>
@@ -464,6 +466,7 @@ function renderPickup(works){
           w.status==='announced' ? '発売日未定' :
           w.date ? '発売日：'+fmtDate(w.date) : ''
         }</p>
+        ${priceBlock(w)}
         ${storeButtons(w, 'p-card-btn', 'card-btns')}
       </div>
     </div>`;}).join('');
@@ -700,6 +703,15 @@ function siteName(url){
   return 'ストア';
 }
 
+function priceBlock(w){
+  if(w.price==null) return '';
+  if(w.on_sale && w.list_price){
+    const off=Math.round((1-w.price/w.list_price)*100);
+    return `<p class="w-card-price"><span class="price-off">${off}%OFF</span><span class="price-now">¥${w.price.toLocaleString()}</span><span class="price-orig">¥${w.list_price.toLocaleString()}</span></p>`;
+  }
+  return `<p class="w-card-price"><span class="price-now">¥${w.price.toLocaleString()}</span></p>`;
+}
+
 function storeButtons(w, btnCls, wrapCls){
   const links = [w.url, w.url2].filter(Boolean);
   const label = u => links.length > 1 ? siteName(u) : siteName(u) + 'で見る';
@@ -714,15 +726,7 @@ function makeWorkCard(w){
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
        <div class="w-card-ph" style="display:none">🎧</div>`
     : `<div class="w-card-ph">🎧</div>`;
-  let priceHtml='';
-  if(w.price!=null){
-    if(w.on_sale && w.list_price){
-      const off=Math.round((1-w.price/w.list_price)*100);
-      priceHtml=`<p class="w-card-price"><span class="price-off">${off}%OFF</span><span class="price-now">¥${w.price.toLocaleString()}</span><span class="price-orig">¥${w.list_price.toLocaleString()}</span></p>`;
-    } else {
-      priceHtml=`<p class="w-card-price"><span class="price-now">¥${w.price.toLocaleString()}</span></p>`;
-    }
-  }
+  const priceHtml = priceBlock(w);
   const ribbon = w.on_sale ? '<span class="sale-ribbon">SALE</span>' : '';
   return `<div class="w-card">
     ${ribbon}
