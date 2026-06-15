@@ -137,7 +137,16 @@
     .fbtn:hover,.fbtn.on{background:var(--green);border-color:var(--green);color:#fff;}
     .works-meta{font-size:.68rem;color:var(--text-muted);letter-spacing:.06em;margin-top:.4rem;margin-bottom:1.2rem;}
     .works-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:1.1rem;}
-    .w-card{background:var(--cream);border:1px solid var(--green-border);border-radius:var(--radius);overflow:hidden;transition:all var(--ease);}
+    .w-card{background:var(--cream);border:1px solid var(--green-border);border-radius:var(--radius);position:relative;overflow:hidden;transition:all var(--ease);}
+    .sale-ribbon{position:absolute;top:8px;left:8px;background:#FF4D6D;color:#fff;font-size:.6rem;font-weight:600;padding:.16rem .5rem;border-radius:3px;z-index:2;letter-spacing:.05em;}
+    .w-card-price{font-size:.72rem;margin-top:.45rem;}
+    .price-now{font-weight:600;color:var(--text);}
+    .price-off{color:#FF4D6D;font-weight:600;margin-right:.3rem;}
+    .price-orig{color:#aaa;text-decoration:line-through;font-size:.64rem;margin-left:.3rem;}
+    .site-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.2rem 0 .8rem;}
+    .sbtn{padding:.34rem .85rem;border-radius:var(--radius-sm);border:1px solid var(--green-border);background:#fff;color:var(--text-sub);font-size:.73rem;cursor:pointer;transition:all var(--ease);}
+    .sbtn.on{background:var(--green);color:#fff;border-color:var(--green);}
+    .sort-select{margin-left:auto;padding:.4rem .7rem;border-radius:var(--radius-sm);border:1px solid var(--green-border);background:#fff;color:var(--text);font-size:.73rem;cursor:pointer;}
     .w-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--green);}
     .w-card-img{aspect-ratio:3/4;object-fit:cover;width:100%;}
     .w-card-ph{aspect-ratio:3/4;background:linear-gradient(160deg,var(--green-light),var(--cream-deep));display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
@@ -355,6 +364,20 @@
       <button class="fbtn" data-f="own">はねしば</button>
       <button class="fbtn" data-f="other">他サークル出演</button>
     </div>
+    <div class="site-row">
+      <button class="sbtn on" data-s="all">すべて</button>
+      <button class="sbtn" data-s="dlsite">DLsite</button>
+      <button class="sbtn" data-s="lovecul">らぶカル</button>
+      <select class="sort-select" id="sort-select">
+        <option value="new">新着順</option>
+        <option value="date_asc">発売日が古い順</option>
+        <option value="price_asc">価格が安い順</option>
+        <option value="price_desc">価格が高い順</option>
+        <option value="off_desc">割引率が高い順</option>
+        <option value="review_desc">レビューが多い順</option>
+        <option value="circle">サークル順</option>
+      </select>
+    </div>
     <div class="genre-section" id="genre-section" style="display:none">
       <p class="genre-label">ジャンル・タグで絞り込む</p>
       <div class="genre-tags" id="genre-tags"></div>
@@ -448,6 +471,8 @@ function renderPickup(works){
 
 let allWorks=[];
 let currentFilter='all';
+let currentSite='all';
+const sortBySite={all:'new',dlsite:'new',lovecul:'new'};
 let displayCount=10;
 const INIT=10, MORE=30;
 
@@ -494,8 +519,22 @@ function getFiltered(f){
   else if(f==='upcoming') list = list.filter(w=>['announced','upcoming','preorder'].includes(w.status));
   else if(f==='own')  list = list.filter(w=>w.circle==='はねしば');
   else if(f==='other') list = list.filter(w=>w.circle!=='はねしば');
+  if(currentSite==='dlsite') list = list.filter(w=>/dlsite\.com/.test(w.url||'')||/dlsite\.com/.test(w.url2||''));
+  else if(currentSite==='lovecul') list = list.filter(w=>/lovecul/.test(w.url||'')||/lovecul/.test(w.url2||''));
   if(currentGenre) list = list.filter(w=>(w.genres||[]).includes(currentGenre));
-  return list;
+  return sortList(list);
+}
+
+function offRate(w){ return (w.on_sale && w.list_price) ? (1 - w.price/w.list_price) : 0; }
+function sortList(list){
+  const a=[...list], s=sortBySite[currentSite];
+  if(s==='date_asc')      a.sort((x,y)=>(x.date||'').localeCompare(y.date||''));
+  else if(s==='price_asc')  a.sort((x,y)=>(x.price??1e9)-(y.price??1e9));
+  else if(s==='price_desc') a.sort((x,y)=>(y.price??-1)-(x.price??-1));
+  else if(s==='off_desc')   a.sort((x,y)=>offRate(y)-offRate(x));
+  else if(s==='review_desc')a.sort((x,y)=>(y.review_count||0)-(x.review_count||0));
+  else if(s==='circle')     a.sort((x,y)=>(x.circle||'').localeCompare(y.circle||'','ja'));
+  return a;  // 'new' は works.json の並び（予告先頭＋発売日降順）を維持
 }
 
 function renderWorks(f='all', reset=true){
@@ -675,12 +714,24 @@ function makeWorkCard(w){
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
        <div class="w-card-ph" style="display:none">🎧</div>`
     : `<div class="w-card-ph">🎧</div>`;
+  let priceHtml='';
+  if(w.price!=null){
+    if(w.on_sale && w.list_price){
+      const off=Math.round((1-w.price/w.list_price)*100);
+      priceHtml=`<p class="w-card-price"><span class="price-off">${off}%OFF</span><span class="price-now">¥${w.price.toLocaleString()}</span><span class="price-orig">¥${w.list_price.toLocaleString()}</span></p>`;
+    } else {
+      priceHtml=`<p class="w-card-price"><span class="price-now">¥${w.price.toLocaleString()}</span></p>`;
+    }
+  }
+  const ribbon = w.on_sale ? '<span class="sale-ribbon">SALE</span>' : '';
   return `<div class="w-card">
+    ${ribbon}
     ${imgHtml}
     <div class="w-card-body">
       <span class="badge ${stCls(w.status)}" style="margin-bottom:.38rem">${stLabel(w.status)}</span>
       <p class="w-card-title">${w.title}</p>
       <p class="w-card-circle">${w.circle}</p>
+      ${priceHtml}
       ${storeButtons(w, 'w-card-btn', 'w-card-btns')}
     </div>
   </div>`;
@@ -760,6 +811,16 @@ document.querySelectorAll('.fbtn').forEach(b=>{
     renderWorks(b.dataset.f, true);
   });
 });
+document.querySelectorAll('.sbtn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.sbtn').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    currentSite=b.dataset.s;
+    const ss=document.getElementById('sort-select'); if(ss) ss.value=sortBySite[currentSite];
+    renderWorks(currentFilter, true);
+  });
+});
+{const ss=document.getElementById('sort-select'); if(ss) ss.addEventListener('change',()=>{sortBySite[currentSite]=ss.value; renderWorks(currentFilter, true);});}
 document.querySelectorAll('.reveal').forEach(el=>{
   new IntersectionObserver(([e])=>{if(e.isIntersecting)e.target.classList.add('in');},{threshold:.08}).observe(el);
 });
