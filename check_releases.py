@@ -175,6 +175,97 @@ def is_released(product_id: str) -> bool:
 
 # ─── メイン ──────────────────────────────────────────────────
 
+# ─── 価格・レビューの日次更新 ─────────────────────────────────
+
+def _yen(t):
+    m = re.search(r"([\d,]+)", t or "")
+    return int(m.group(1).replace(",", "")) if m else None
+
+def fetch_dlsite_prices() -> dict:
+    """DLsite 羽柴礼検索から RJ→{price,list_price,review_count} を取得"""
+    out = {}
+    for page in [1, 2]:
+        url = ("https://www.dlsite.com/girls/fsr/=/keyword/"
+               "%E7%BE%BD%E6%9F%B4%E7%A4%BC/work_category%5B0%5D/doujin/per_page/100/page/"
+               f"{page}/")
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=25); r.encoding = "utf-8"
+            soup = BeautifulSoup(r.text, "lxml")
+            for a in soup.select("a[href*='/product_id/RJ']"):
+                li = a.find_parent("li") or a.find_parent("tr")
+                if not li: continue
+                m = re.search(r"product_id/(RJ\d+)", a["href"])
+                if not m or m.group(1) in out: continue
+                pr = li.select_one(".work_price")
+                if not pr: continue
+                price = _yen(pr.get_text())
+                st = li.select_one(".strike")
+                lp = _yen(st.get_text()) if st else price
+                wr = li.select_one(".work_review")
+                rc = 0
+                if wr:
+                    mm = re.search(r"(\d+)", wr.get_text())
+                    rc = int(mm.group(1)) if mm else 0
+                out[m.group(1)] = {"price": price, "list_price": lp, "review_count": rc}
+        except Exception as e:
+            print(f"  [DLsite価格取得エラー] {e}")
+        time.sleep(0.5)
+    return out
+
+def fetch_dmm_prices() -> dict:
+    """DMM 羽柴礼検索から cid→{price,list_price,review_count} を取得"""
+    out = {}
+    api_id = os.environ.get("DMM_API_ID", ""); aff = os.environ.get("DMM_AFFILIATE_ID", "")
+    if not api_id or not aff:
+        return out
+    try:
+        r = requests.get("https://api.dmm.com/affiliate/v3/ItemList", params={
+            "api_id": api_id, "affiliate_id": aff, "site": "FANZA", "service": "doujin",
+            "floor": "digital_doujin_tl", "keyword": "羽柴礼", "hits": 100, "output": "json"}, timeout=15)
+        for x in r.json().get("result", {}).get("items", []):
+            p = x.get("prices", {}); rv = x.get("review", {})
+            out[x["content_id"]] = {
+                "price": int(p["price"]) if str(p.get("price","")).isdigit() else None,
+                "list_price": int(p["list_price"]) if str(p.get("list_price","")).isdigit() else None,
+                "review_count": rv.get("count", 0)}
+    except Exception as e:
+        print(f"  [DMM価格取得エラー] {e}")
+    return out
+
+def update_prices_reviews(works: list) -> bool:
+    """全released作品の価格・レビューを最新化。変更があればTrue"""
+    dl = fetch_dlsite_prices(); dmm = fetch_dmm_prices()
+    if not dl and not dmm:
+        print("  価格データ取得できず（スキップ）")
+        return False
+    changed = False
+    for w in works:
+        if w.get("status") != "released":
+            continue
+        u, u2 = w.get("url",""), w.get("url2","")
+        rjm = re.search(r"product_id/(RJ\d+)", u) or re.search(r"product_id/(RJ\d+)", u2)
+        cidm = re.search(r"cid=(\w+)", u) or re.search(r"cid=(\w+)", u2)
+        rj = rjm.group(1) if rjm else None
+        cid = cidm.group(1) if cidm else None
+        # 価格：主URLサイト基準
+        np = nlp = None
+        if "dlsite" in u and rj in dl:
+            np = dl[rj]["price"]; nlp = dl[rj]["list_price"]
+        elif cid in dmm:
+            np = dmm[cid]["price"]; nlp = dmm[cid]["list_price"]
+        # レビュー件数：取得できた中の最大
+        counts = []
+        if rj in dl: counts.append(dl[rj]["review_count"])
+        if cid in dmm: counts.append(dmm[cid]["review_count"])
+        nrc = max(counts) if counts else 0
+        if np is not None and (w.get("price") != np or w.get("list_price") != nlp):
+            w["price"] = np; w["list_price"] = nlp
+            w["on_sale"] = bool(nlp and np < nlp); changed = True
+        if w.get("review_count") != nrc:
+            w["review_count"] = nrc; changed = True
+    return changed
+
+
 def main():
     with open("works.json", encoding="utf-8") as f:
         data = json.load(f)
@@ -247,6 +338,12 @@ def main():
                 print(f"     発売時期：DLsite未記載")
 
         time.sleep(1)
+
+    # 価格・レビューの日次更新（全released作品）
+    print("\n💰 価格・レビュー更新中...")
+    if update_prices_reviews(works):
+        changed = True
+        print("  価格・レビューを更新しました")
 
     if changed:
         # released作品を発売日新しい順に並び替え
