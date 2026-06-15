@@ -32,7 +32,7 @@ def dmm_api_lookup(cid: str) -> dict | None:
     try:
         r = requests.get("https://api.dmm.com/affiliate/v3/ItemList", params={
             "api_id": api_id, "affiliate_id": aff_id,
-            "site": "FANZA", "service": "doujin", "floor": "digital_doujin",
+            "site": "FANZA", "service": "doujin", "floor": "digital_doujin_tl",
             "cid": cid, "output": "json",
         }, timeout=15)
         items = r.json().get("result", {}).get("items", [])
