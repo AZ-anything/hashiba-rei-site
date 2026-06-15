@@ -142,7 +142,7 @@ def parse_lovecul(url: str) -> dict:
 
     r = requests.get("https://api.dmm.com/affiliate/v3/ItemList", params={
         "api_id": api_id, "affiliate_id": aff_id,
-        "site": "FANZA", "service": "doujin", "floor": "digital_doujin",
+        "site": "FANZA", "service": "doujin", "floor": "digital_doujin_tl",
         "cid": cid, "output": "json",
     }, timeout=15)
     result = r.json().get("result", {})
