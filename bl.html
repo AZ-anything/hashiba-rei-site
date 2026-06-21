@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReiVox BL | 羽柴令</title>
+  <meta name="description" content="声優・羽柴令のBL作品ポートフォリオ。BL出演作品はこちら。">
+
+  <!-- OGP -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://reivox.jp/bl.html">
+  <meta property="og:title"       content="ReiVox BL | 羽柴令">
+  <meta property="og:description" content="声優・羽柴令のBL作品ポートフォリオ。">
+  <meta property="og:image"       content="https://hashiba-rei.netlify.app/ogp.png">
+  <meta property="og:locale"      content="ja_JP">
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card"        content="summary">
+  <meta name="twitter:site"        content="@hashiba_rei">
+  <meta name="twitter:title"       content="ReiVox BL | 羽柴令">
+  <meta name="twitter:description" content="声優・羽柴令のBL作品ポートフォリオ。">
+  <meta name="twitter:image"       content="https://hashiba-rei.netlify.app/ogp.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream:#F3F5F8;--cream-deep:#E7EBF1;--green:#2563EB;--green-mid:#1D4ED8;
+      --green-light:#E4ECF8;--green-border:#C7D3E2;--yellow:#334155;
+      --yellow-light:#EDF0F4;--yellow-border:#D2DAE3;--text:#1F2937;
+      --text-sub:#4B5563;--text-muted:#94A3B8;--white:#FFFFFF;
+      --radius:12px;--radius-sm:8px;
+      --shadow:0 4px 28px rgba(30,41,59,.12);--shadow-sm:0 2px 14px rgba(30,41,59,.09);
+      --ease:0.24s cubic-bezier(.4,0,.2,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Noto Sans JP',sans-serif;background:var(--cream);color:var(--text);line-height:1.75;}
+    img{max-width:100%;display:block;}
+    a{color:inherit;text-decoration:none;}
+    /* overflow-x:clip は position:fixed に影響しない（hiddenと異なる）*/
+    html{overflow-x:clip;}
+    body{overflow-x:clip;}
+
+    nav{position:sticky;top:0;z-index:200;background:rgba(23,31,43,.96);backdrop-filter:blur(14px);border-bottom:1px solid #2B3645;}
+    .nav-in{max-width:1100px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:58px;}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:400;letter-spacing:.2em;color:#FFFFFF;}
+    .nav-ul{display:flex;gap:2rem;list-style:none;}
+    .nav-ul a{font-size:.75rem;letter-spacing:.12em;color:#CBD5E1;transition:color var(--ease);}
+    .nav-ul a:hover{color:#60A5FA;}
+
+    .wrap{max-width:1100px;margin:0 auto;padding:0 2rem;}
+    .sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.7rem,4vw,2.4rem);font-weight:300;letter-spacing:.15em;color:var(--green);display:flex;align-items:center;gap:1.2rem;}
+    .sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--green-border),transparent);}
+    .sec-sub{font-size:.72rem;letter-spacing:.15em;color:var(--text-muted);margin-top:.3rem;}
+
+    #profile{padding:5rem 0 4.5rem;background:linear-gradient(148deg,var(--cream) 0%,var(--green-light) 100%);border-bottom:1px solid var(--green-border);}
+    .profile-grid{display:grid;grid-template-columns:auto 1fr;gap:3.5rem;align-items:start;}
+    .avatar-wrap{position:relative;}
+    .avatar{width:168px;height:168px;border-radius:50%;object-fit:cover;border:3px solid var(--white);box-shadow:var(--shadow);}
+    .avatar-ring{position:absolute;inset:-7px;border-radius:50%;border:1.5px solid var(--green-border);animation:spin 18s linear infinite;border-top-color:var(--yellow-border);}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .p-name-en{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.4rem);font-weight:300;letter-spacing:.22em;color:var(--green);line-height:1.05;}
+    .p-name-ja{font-family:'Noto Serif JP',serif;font-size:1.05rem;font-weight:300;letter-spacing:.22em;color:var(--text-sub);margin-top:.35rem;}
+    .p-badge{display:inline-block;margin-top:.9rem;padding:.22rem .85rem;background:var(--yellow-light);border:1px solid var(--yellow-border);border-radius:20px;font-size:.7rem;letter-spacing:.1em;color:var(--yellow);}
+    .p-bio{margin-top:1.2rem;font-size:.88rem;color:var(--text-sub);line-height:1.95;max-width:480px;}
+    .p-links{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.6rem;}
+    .p-link{display:inline-flex;align-items:center;gap:.42rem;padding:.44rem 1rem;background:var(--white);border:1px solid var(--green-border);border-radius:30px;font-size:.76rem;letter-spacing:.05em;color:var(--text-sub);transition:all var(--ease);}
+    .p-link:hover{background:var(--green-light);border-color:var(--green);color:var(--green);transform:translateY(-1px);}
+    .p-link svg{width:14px;height:14px;flex-shrink:0;}
+
+    #pickup{background:var(--yellow-light);border-bottom:1px solid var(--yellow-border);padding:3.5rem 0;}
+    .pickup-head{display:flex;align-items:center;gap:.9rem;margin-bottom:1.8rem;}
+    .pickup-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.28rem .85rem;background:var(--yellow);color:#fff;border-radius:4px;font-size:.7rem;font-weight:500;letter-spacing:.12em;}
+    .pickup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:1.1rem;}
+    .p-card{background:var(--white);border:1px solid var(--yellow-border);border-radius:var(--radius);position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);transition:all var(--ease);}
+    .p-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+    .p-card.p-card-new{border:2px solid #FF4D6D;box-shadow:0 0 0 1px rgba(255,77,109,.15);}
+    .p-card.p-card-new:hover{box-shadow:0 6px 20px rgba(255,77,109,.2);}
+    .p-card-img{aspect-ratio:4/3;object-fit:cover;width:100%;}
+    .p-card-ph{aspect-ratio:4/3;background:linear-gradient(135deg,var(--green-light),var(--yellow-light));display:flex;align-items:center;justify-content:center;font-size:2.2rem;}
+    .p-card-body{padding:1rem;flex:1;display:flex;flex-direction:column;}
+    .p-card-title{font-size:.88rem;font-weight:500;line-height:1.5;flex:1;}
+    .p-card-circle{font-size:.7rem;color:var(--text-muted);margin-top:.45rem;}
+    .p-card-date{font-size:.7rem;color:var(--text-sub);margin-top:.3rem;}
+    .p-card-btn{display:block;margin-top:.85rem;padding:.48rem;text-align:center;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:.73rem;letter-spacing:.08em;transition:background var(--ease);}
+    .p-card-btn:hover{background:var(--green-mid);}
+    .card-btns{display:flex;gap:.45rem;margin-top:.85rem;}
+    .card-btns .p-card-btn{flex:1;margin-top:0;}
+    .w-card-btns{display:flex;gap:.4rem;margin-top:.65rem;}
+    .w-card-btn{flex:1;display:block;padding:.4rem .2rem;text-align:center;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:.65rem;letter-spacing:.05em;transition:background var(--ease);}
+    .w-card-btn:hover{background:var(--green-mid);}
+
+    .badge{display:inline-block;padding:.17rem .58rem;border-radius:3px;font-size:.67rem;letter-spacing:.07em;font-weight:500;margin-bottom:.48rem;}
+    .badge-yellow{background:var(--yellow-light);color:var(--yellow);border:1px solid var(--yellow-border);}
+    .badge-orange{background:#FFF0E8;color:#C06A30;border:1px solid #F0C0A0;}
+    .badge-green{background:var(--green-light);color:var(--green);border:1px solid var(--green-border);}
+    .badge-new{background:#FF4D6D;color:#fff;border:none;font-weight:700;letter-spacing:.14em;animation:pulse-new 2s ease-in-out infinite;}
+    @keyframes pulse-new{0%,100%{box-shadow:0 0 0 0 rgba(255,77,109,.4);}50%{box-shadow:0 0 0 5px rgba(255,77,109,0);}}
+
+    /* ─── SEARCH ─── */
+    .search-wrap{position:relative;margin-bottom:1.4rem;}
+    .search-input{
+      width:100%;padding:.72rem 2.8rem .72rem 2.6rem;
+      border:1.5px solid var(--green-border);border-radius:30px;
+      background:var(--white);font-family:'Noto Sans JP',sans-serif;
+      font-size:.85rem;color:var(--text);outline:none;
+      transition:border-color var(--ease),box-shadow var(--ease);
+    }
+    .search-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(77,112,82,.1);}
+    .search-input::placeholder{color:var(--text-muted);}
+    .search-icon{position:absolute;left:.95rem;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;width:16px;height:16px;}
+    .search-clear{position:absolute;right:.95rem;top:50%;transform:translateY(-50%);width:18px;height:18px;cursor:pointer;color:var(--text-muted);display:none;transition:color var(--ease);}
+    .search-clear:hover{color:var(--text);}
+    .suggest-list{
+      position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:100;
+      background:var(--white);border:1px solid var(--green-border);
+      border-radius:var(--radius);box-shadow:var(--shadow);
+      max-height:320px;overflow-y:auto;display:none;
+    }
+    .suggest-item{
+      display:flex;align-items:center;gap:.8rem;
+      padding:.65rem 1rem;cursor:pointer;
+      transition:background var(--ease);border-bottom:1px solid var(--cream-deep);
+    }
+    .suggest-item:last-child{border-bottom:none;}
+    .suggest-item:hover{background:var(--green-light);}
+    .suggest-thumb{width:38px;height:38px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--cream-deep);}
+    .suggest-ph{width:38px;height:38px;border-radius:6px;flex-shrink:0;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:1rem;}
+    .suggest-title{font-size:.8rem;color:var(--text);line-height:1.4;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+    .suggest-circle{font-size:.68rem;color:var(--text-muted);margin-top:.15rem;}
+    .suggest-empty{padding:1.2rem;text-align:center;color:var(--text-muted);font-size:.82rem;}
+    mark{background:var(--yellow-light);color:var(--yellow);border-radius:2px;padding:0 1px;}
+
+    #works{background:var(--white);padding:5rem 0;}
+    .filter-row{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.8rem 0;}
+    .fbtn{padding:.42rem 1.15rem;border:1.5px solid var(--green-border);border-radius:30px;background:transparent;font-family:'Noto Sans JP',sans-serif;font-size:.76rem;letter-spacing:.07em;color:var(--text-sub);cursor:pointer;transition:all var(--ease);}
+    .fbtn:hover,.fbtn.on{background:var(--green);border-color:var(--green);color:#fff;}
+    .works-meta{font-size:.68rem;color:var(--text-muted);letter-spacing:.06em;margin-top:.4rem;margin-bottom:1.2rem;}
+    .works-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:1.1rem;}
+    .w-card{background:var(--cream);border:1px solid var(--green-border);border-radius:var(--radius);position:relative;overflow:hidden;transition:all var(--ease);}
+    .sale-ribbon{position:absolute;top:8px;left:8px;background:#FF4D6D;color:#fff;font-size:.6rem;font-weight:600;padding:.16rem .5rem;border-radius:3px;z-index:2;letter-spacing:.05em;}
+    .w-card-price{font-size:.72rem;margin-top:.45rem;}
+    .price-now{font-weight:600;color:var(--text);}
+    .price-off{color:#FF4D6D;font-weight:600;margin-right:.3rem;}
+    .price-orig{color:#aaa;text-decoration:line-through;font-size:.64rem;margin-left:.3rem;}
+    .site-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.2rem 0 .8rem;}
+    .sbtn{padding:.34rem .85rem;border-radius:var(--radius-sm);border:1px solid var(--green-border);background:#fff;color:var(--text-sub);font-size:.73rem;cursor:pointer;transition:all var(--ease);}
+    .sbtn.on{background:var(--green);color:#fff;border-color:var(--green);}
+    .sort-select{margin-left:auto;padding:.4rem .7rem;border-radius:var(--radius-sm);border:1px solid var(--green-border);background:#fff;color:var(--text);font-size:.73rem;cursor:pointer;}
+    .w-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--green);}
+    .w-card-img{aspect-ratio:3/4;object-fit:cover;width:100%;}
+    .w-card-ph{aspect-ratio:3/4;background:linear-gradient(160deg,var(--green-light),var(--cream-deep));display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
+    .w-card-body{padding:.8rem;}
+    .w-card-title{font-size:.78rem;line-height:1.5;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .w-card-circle{font-size:.67rem;color:var(--text-muted);margin-top:.4rem;}
+
+    .works-more{text-align:center;margin-top:2rem;}
+    .works-more-btn{display:inline-block;padding:.65rem 2.2rem;border:1.5px solid var(--green);border-radius:30px;font-family:'Noto Sans JP',sans-serif;font-size:.8rem;letter-spacing:.1em;color:var(--green);background:transparent;cursor:pointer;transition:all var(--ease);}
+    .works-more-btn:hover{background:var(--green);color:#fff;}
+    .genre-section{margin:.6rem 0 1.4rem;}
+    .genre-label{font-size:.68rem;color:var(--text-muted);letter-spacing:.08em;margin-bottom:.5rem;}
+    .genre-tags{display:flex;flex-wrap:wrap;gap:.4rem;}
+    .genre-tag{display:inline-block;padding:.2rem .7rem;border:1px solid var(--green-border);border-radius:20px;font-size:.68rem;color:var(--text-sub);cursor:pointer;transition:all var(--ease);background:transparent;}
+    .genre-tag:hover,.genre-tag.on{background:var(--green);border-color:var(--green);color:#fff;}
+    .works-count{font-size:.72rem;color:var(--text-muted);margin-top:.6rem;}
+
+    #youtube{background:var(--cream-deep);padding:5rem 0;}
+    .yt-tabs{display:flex;gap:.5rem;margin:1.5rem 0 0;}
+    .yt-tab{padding:.4rem 1.1rem;border:1.5px solid var(--green-border);border-radius:30px;background:transparent;font-family:'Noto Sans JP',sans-serif;font-size:.76rem;letter-spacing:.07em;color:var(--text-sub);cursor:pointer;transition:all var(--ease);}
+    .yt-tab:hover,.yt-tab.on{background:var(--green);border-color:var(--green);color:#fff;}
+    .yt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:1.1rem;margin-top:1.2rem;}
+    .yt-card{background:var(--white);border:1px solid var(--green-border);border-radius:var(--radius);overflow:hidden;transition:all var(--ease);cursor:pointer;}
+    .yt-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+    .yt-thumb-wrap{position:relative;aspect-ratio:16/9;overflow:hidden;}
+    .yt-thumb{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;}
+    .yt-card:hover .yt-thumb{transform:scale(1.04);}
+    .yt-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.14);opacity:0;transition:opacity var(--ease);}
+    .yt-card:hover .yt-overlay{opacity:1;}
+    .yt-play{width:46px;height:46px;background:rgba(255,255,255,.94);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+    .yt-body{padding:.9rem;}
+    .yt-title{font-size:.8rem;line-height:1.5;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .yt-date{font-size:.68rem;color:var(--text-muted);margin-top:.35rem;}
+    .yt-members-badge{display:inline-flex;align-items:center;gap:.25rem;font-size:.62rem;color:#fff;background:linear-gradient(135deg,#0f9d58,#0b8043);padding:.15rem .55rem;border-radius:10px;margin-top:.35rem;letter-spacing:.04em;}
+    .yt-members-badge svg{width:10px;height:10px;fill:currentColor;}
+    .yt-tab-count{font-size:.64rem;opacity:.7;margin-left:.2rem;}
+    .yt-tab.on .yt-tab-count{opacity:.85;}
+    .yt-show-all{display:block;margin:1.5rem auto 0;padding:.55rem 2rem;border:1.5px solid var(--green-border);border-radius:30px;background:transparent;font-family:'Noto Sans JP',sans-serif;font-size:.76rem;color:var(--text-sub);cursor:pointer;transition:all var(--ease);}
+    .yt-show-all:hover{background:var(--green);border-color:var(--green);color:#fff;}
+    .yt-join{display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;padding:.45rem 1.2rem;border:1.5px solid #0f9d58;border-radius:30px;font-size:.72rem;color:#0f9d58;transition:all var(--ease);}
+    .yt-join:hover{background:#0f9d58;color:#fff;}
+    .yt-join svg{width:13px;height:13px;fill:currentColor;}
+    .yt-more{text-align:center;margin-top:2rem;}
+    .btn-ol{display:inline-block;padding:.62rem 2rem;border:1.5px solid var(--green);border-radius:30px;font-size:.8rem;letter-spacing:.1em;color:var(--green);transition:all var(--ease);}
+    .btn-ol:hover{background:var(--green);color:#fff;}
+
+    footer{background:var(--text);color:rgba(255,255,255,.55);padding:3.5rem 0;text-align:center;}
+    .ft-name{font-family:'Cormorant Garamond',serif;font-size:1.65rem;font-weight:300;letter-spacing:.22em;color:rgba(255,255,255,.88);margin-bottom:1.2rem;}
+    .ft-links{display:flex;justify-content:center;flex-wrap:wrap;gap:1.2rem;margin-bottom:1.5rem;}
+    .ft-link{font-size:.73rem;letter-spacing:.1em;color:rgba(255,255,255,.45);transition:color var(--ease);}
+    .ft-link:hover{color:rgba(255,255,255,.88);}
+    .ft-copy{font-size:.68rem;letter-spacing:.07em;}
+
+    .empty{text-align:center;padding:2.5rem;color:var(--text-muted);font-size:.83rem;grid-column:1/-1;}
+    .dots{display:inline-flex;gap:4px;}
+    .dots span{width:6px;height:6px;border-radius:50%;background:var(--green);animation:dot 1.2s infinite;}
+    .dots span:nth-child(2){animation-delay:.2s;}.dots span:nth-child(3){animation-delay:.4s;}
+    @keyframes dot{0%,80%,100%{opacity:.35;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    /* opacity:0を直接指定しない → アニメーション未対応環境でも表示される */
+    .fu{animation:fadeUp .7s ease both;}
+    .fu1{animation-delay:.08s;animation-fill-mode:both;}
+    .fu2{animation-delay:.18s;animation-fill-mode:both;}
+    .fu3{animation-delay:.28s;animation-fill-mode:both;}
+    /* revealはopacity:0をなくしてtransformだけに変更（より安全）*/
+    .reveal{transform:translateY(14px);transition:opacity .6s ease,transform .6s ease;}
+    .reveal.in{transform:translateY(0);}
+
+    /* ── ボトムナビは廃止（iOS不具合）── */
+
+    @media(max-width:700px){
+      /* nav: リンクを横スクロールで表示 */
+      .nav-in{height:auto;padding:.5rem 1rem;flex-wrap:wrap;gap:.3rem;}
+      .nav-ul{display:flex;overflow-x:auto;flex-wrap:nowrap;gap:.8rem;padding:.2rem 0;scrollbar-width:none;}
+      .nav-ul::-webkit-scrollbar{display:none;}
+      .nav-ul a{font-size:.78rem;white-space:nowrap;}
+
+      /* layout */
+      .wrap{padding:0 1rem;}
+      section{padding:2.2rem 0;}
+
+      /* profile */
+      #profile{padding:2.5rem 0 2.2rem;}
+      .profile-grid{grid-template-columns:1fr;gap:1.5rem;text-align:center;}
+      .avatar-wrap{margin:0 auto;}
+      .avatar{width:120px;height:120px;}
+      .p-name-en{font-size:2rem;letter-spacing:.15em;}
+      .p-name-ja{font-size:.9rem;}
+      .p-bio{font-size:.83rem;margin:1rem auto 0;max-width:100%;}
+      .p-links{justify-content:center;}
+      .p-link{font-size:.78rem;padding:.5rem .9rem;min-height:44px;}
+
+      /* pickup */
+      .pickup-grid{grid-template-columns:1fr 1fr;gap:.7rem;}
+      .p-card-title{font-size:.8rem;}
+      .p-card-btn{font-size:.7rem;padding:.42rem;}
+
+      /* works */
+      .works-grid{grid-template-columns:1fr 1fr;gap:.7rem;}
+      .filter-row{display:flex;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:.4rem;gap:.4rem;scrollbar-width:none;}
+      .filter-row::-webkit-scrollbar{display:none;}
+      .fbtn{white-space:nowrap;flex-shrink:0;padding:.38rem .9rem;}
+
+      /* youtube */
+      .yt-tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+      .yt-tabs::-webkit-scrollbar{display:none;}
+      .yt-tab{white-space:nowrap;flex-shrink:0;}
+      .yt-grid{grid-template-columns:1fr;}
+
+      /* footer */
+      .ft-links{gap:.7rem;}
+      .ft-name{font-size:1.3rem;}
+      .sec-title{font-size:1.5rem;}
+    }
+    @media(max-width:390px){
+      .pickup-grid{grid-template-columns:1fr;}
+      .p-link{font-size:.73rem;padding:.44rem .75rem;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <span class="nav-logo">ReiVox <span style="font-size:.7rem;letter-spacing:.18em;color:#60A5FA">BL</span></span>
+    <ul class="nav-ul">
+      <li><a href="/index.html">乙女向け</a></li>
+      <li><a href="#pickup">新着・予告</a></li>
+      <li><a href="#works">BL作品</a></li>
+      <li><a href="#youtube">YouTube</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section id="profile">
+  <div class="wrap">
+    <div class="profile-grid">
+      <div class="avatar-wrap fu">
+        <img class="avatar" src="https://contents.potofu.me/images/3ZyllySoyhTQ.jpg" alt="羽柴令">
+        <div class="avatar-ring"></div>
+      </div>
+      <div>
+        <p class="p-name-en fu fu1">Hashiba Rei</p>
+        <p class="p-name-ja fu fu1">羽 柴 令</p>
+        <span class="p-badge fu fu2">18禁声優 / Voice Actor</span>
+        <p class="p-bio fu fu2">
+          BL作品の声優・羽柴令名義のページです。<br>
+          18歳未満の方は数年後にまたお会いしましょう。<br>
+          <a href="/index.html" style="color:var(--green);text-decoration:underline;text-underline-offset:3px;">乙女向け作品（羽柴礼）はこちら</a> ／
+          <a href="/request.html" style="color:var(--green);text-decoration:underline;text-underline-offset:3px;">出演依頼はこちら</a>
+        </p>
+        <div class="p-links fu fu3">
+          <a class="p-link" href="https://ci-en.dlsite.com/creator/12504" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>Ci-en
+          </a>
+          <a class="p-link" href="https://x.com/hashiba_rei" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@hashiba_rei
+          </a>
+          <a class="p-link" href="https://www.youtube.com/channel/UCn3tBA3UvmDtB_0LyKEG-hA" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>YouTube
+          </a>
+          <a class="p-link" href="https://hashibarei.booth.pm/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>BOOTH
+          </a>
+          <a class="p-link" href="https://marshmallow-qa.com/mxpgdaivef5ljmj" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>マシュマロ
+          </a>
+          <a class="p-link" href="https://www.amazon.co.jp/hz/wishlist/ls/30M66HRX3ZMJ" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>ほしいものリスト
+          </a>
+          <!-- Doneru: ギフトボックスアイコン -->
+          <a class="p-link" href="https://doneru.jp/hashiba_rei" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 12 20 22 4 22 4 12"/>
+              <rect x="2" y="7" width="20" height="5"/>
+              <line x1="12" y1="22" x2="12" y2="7"/>
+              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+              <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+            </svg>Doneru
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pickup">
+  <div class="wrap">
+    <div class="pickup-head">
+      <span class="pickup-chip">★ PICKUP</span>
+      <div><div class="sec-title" style="font-size:1.35rem">予告・新着作品</div></div>
+    </div>
+    <div class="pickup-grid" id="pickup-grid">
+      <div class="empty"><div class="dots"><span></span><span></span><span></span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="works">
+  <div class="wrap reveal">
+    <div class="sec-title">Works</div>
+    <p class="sec-sub">BL出演作品一覧（羽柴令 名義）</p>
+    <p class="works-meta" id="works-meta"></p>
+
+    <!-- 検索バー -->
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" id="search-input" type="search" placeholder="タイトル・サークル名・ジャンルで検索…" autocomplete="off">
+      <svg class="search-clear" id="search-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <div class="suggest-list" id="suggest-list"></div>
+    </div>
+    <div class="filter-row">
+      <button class="fbtn on" data-f="all">すべて</button>
+      <button class="fbtn" data-f="released">販売中</button>
+      <button class="fbtn" data-f="upcoming">予告・近日発売</button>
+    </div>
+    <div class="site-row">
+      <button class="sbtn on" data-s="all">すべて</button>
+      <button class="sbtn" data-s="dlsite">DLsite</button>
+      <button class="sbtn" data-s="lovecul">らぶカル</button>
+      <select class="sort-select" id="sort-select">
+        <option value="new">新着順</option>
+        <option value="date_asc">発売日が古い順</option>
+        <option value="price_asc">価格が安い順</option>
+        <option value="price_desc">価格が高い順</option>
+        <option value="off_desc">割引率が高い順</option>
+        <option value="review_desc">レビューが多い順</option>
+        <option value="circle">サークル順</option>
+      </select>
+    </div>
+    <div class="genre-section" id="genre-section" style="display:none">
+      <p class="genre-label">ジャンル・タグで絞り込む</p>
+      <div class="genre-tags" id="genre-tags"></div>
+    </div>
+    <div class="works-grid" id="works-grid">
+      <div class="empty"><div class="dots"><span></span><span></span><span></span></div></div>
+    </div>
+    <div class="works-more" id="works-more" style="display:none">
+      <button class="works-more-btn" onclick="loadMoreWorks()">更に表示</button>
+      <p class="works-count" id="works-count"></p>
+    </div>
+  </div>
+</section>
+
+<section id="youtube">
+  <div class="wrap reveal">
+    <div class="sec-title">YouTube</div>
+    <p class="sec-sub">最新の動画</p>
+    <div class="yt-tabs" id="yt-tabs">
+      <button class="yt-tab on" data-yt="videos">動画</button>
+      <button class="yt-tab" data-yt="utatte">歌ってみた</button>
+      <button class="yt-tab" data-yt="lives">ライブ</button>
+      <button class="yt-tab" data-yt="shorts">ショート</button>
+    </div>
+    <div class="yt-grid" id="yt-grid">
+      <div class="empty"><div class="dots"><span></span><span></span><span></span></div></div>
+    </div>
+    <div id="yt-show-all-wrap"></div>
+    <div class="yt-more" style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;align-items:center;">
+      <a class="btn-ol" href="https://www.youtube.com/channel/UCn3tBA3UvmDtB_0LyKEG-hA" target="_blank" rel="noopener">チャンネルをもっと見る</a>
+      <a class="yt-join" href="https://www.youtube.com/channel/UCn3tBA3UvmDtB_0LyKEG-hA/join" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.4 0 2.8 1.1 2.8 2.5V11c0 1.4-1.4 2.5-2.8 2.5s-2.8-1.1-2.8-2.5V9.5C9.2 8.1 10.6 7 12 7zm4.2 10.3c0 .1-1.3 1.2-4.2 1.2s-4.2-1.1-4.2-1.2C7.8 15.6 9.7 14.5 12 14.5s4.2 1.1 4.2 2.8z"/></svg>
+        メンバーになる
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="ft-name">ReiVox</p>
+    <div class="ft-links">
+      <a class="ft-link" href="https://ci-en.dlsite.com/creator/12504" target="_blank">Ci-en</a>
+      <a class="ft-link" href="https://x.com/hashiba_rei" target="_blank">X (Twitter)</a>
+      <a class="ft-link" href="https://www.youtube.com/channel/UCn3tBA3UvmDtB_0LyKEG-hA" target="_blank">YouTube</a>
+      <a class="ft-link" href="https://hashibarei.booth.pm/" target="_blank">BOOTH</a>
+      <a class="ft-link" href="https://marshmallow-qa.com/mxpgdaivef5ljmj" target="_blank">マシュマロ</a>
+      <a class="ft-link" href="https://doneru.jp/hashiba_rei" target="_blank">Doneru</a>
+      <a class="ft-link" href="/index.html">乙女向け作品（羽柴礼）</a>
+      <a class="ft-link" href="/request.html">ご依頼について</a>
+    </div>
+    <p class="ft-copy">© 2025 Hashiba Rei. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+const YT_CH="UCn3tBA3UvmDtB_0LyKEG-hA";
+function stLabel(s){return{announced:'予告',upcoming:'近日発売',preorder:'予約受付中',released:'販売中'}[s]||s;}
+function stCls(s){return{announced:'badge-yellow',upcoming:'badge-yellow',preorder:'badge-orange',released:'badge-green'}[s]||'badge-green';}
+function fmtDate(s){if(!s)return'';const d=new Date(s);return`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;}
+function isNew(s){return s&&(Date.now()-new Date(s))<864e5*30;}
+function coverHtml(w,ic,pc){
+  if(w.cover)return`<img class="${ic}" src="${w.cover}" alt="${w.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="${pc}" style="display:none">🎧</div>`;
+  return`<div class="${pc}">🎧</div>`;
+}
+
+function renderPickup(works){
+  const list=works.filter(w=>['announced','upcoming','preorder'].includes(w.status)||(w.status==='released'&&isNew(w.date)));
+  const g=document.getElementById('pickup-grid');
+  if(!list.length){g.innerHTML='<div class="empty">現在ピックアップ作品はありません</div>';return;}
+  g.innerHTML=list.map(w=>{
+    const isNewRelease=w.status==='released'&&isNew(w.date);
+    const badgeCls=isNewRelease?'badge-new':stCls(w.status);
+    const badgeLabel=isNewRelease?'✦ NEW':stLabel(w.status);
+    const cardCls=isNewRelease?'p-card p-card-new':'p-card';
+    const ribbon = w.on_sale ? '<span class="sale-ribbon">SALE</span>' : '';
+    return`
+    <div class="${cardCls}">
+      ${ribbon}
+      ${coverHtml(w,'p-card-img','p-card-ph')}
+      <div class="p-card-body">
+        <span class="badge ${badgeCls}">${badgeLabel}</span>
+        <p class="p-card-title">${w.title}</p>
+        <p class="p-card-circle">${w.circle}</p>
+        <p class="p-card-date">${
+          w.status==='announced' && w.release_period ? `発売時期：${w.release_period}` :
+          w.status==='announced' ? '発売日未定' :
+          w.date ? '発売日：'+fmtDate(w.date) : ''
+        }</p>
+        ${priceBlock(w)}
+        ${storeButtons(w, 'p-card-btn', 'card-btns')}
+      </div>
+    </div>`;}).join('');
+}
+
+let allWorks=[];
+let currentFilter='all';
+let currentSite='all';
+const sortBySite={all:'new',dlsite:'new',lovecul:'new'};
+let displayCount=10;
+const INIT=10, MORE=30;
+
+let currentGenre = '';
+
+function buildGenreTags(){
+  const counter = {};
+  allWorks.forEach(w=>{
+    (w.genres||[]).forEach(g=>{ counter[g]=(counter[g]||0)+1; });
+  });
+  // 出現数上位30件を表示
+  const top = Object.entries(counter)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,15)
+    .map(([g])=>g);
+
+  const section = document.getElementById('genre-section');
+  const container = document.getElementById('genre-tags');
+  if(!top.length){ section.style.display='none'; return; }
+  container.innerHTML = top.map(g=>
+    `<span class="genre-tag" data-g="${g}">${g}</span>`
+  ).join('');
+  section.style.display='block';
+
+  container.querySelectorAll('.genre-tag').forEach(t=>{
+    t.addEventListener('click', ()=>{
+      const g = t.dataset.g;
+      if(currentGenre === g){
+        currentGenre = '';
+        t.classList.remove('on');
+      } else {
+        currentGenre = g;
+        container.querySelectorAll('.genre-tag').forEach(x=>x.classList.remove('on'));
+        t.classList.add('on');
+      }
+      renderWorks(currentFilter, true);
+    });
+  });
+}
+
+function getFiltered(f){
+  let list = allWorks;
+  if(f==='released') list = list.filter(w=>w.status==='released');
+  else if(f==='upcoming') list = list.filter(w=>['announced','upcoming','preorder'].includes(w.status));
+  else if(f==='own')  list = list.filter(w=>w.circle==='はねしば');
+  else if(f==='other') list = list.filter(w=>w.circle!=='はねしば');
+  if(currentSite==='dlsite') list = list.filter(w=>/dlsite\.com/.test(w.url||'')||/dlsite\.com/.test(w.url2||''));
+  else if(currentSite==='lovecul') list = list.filter(w=>/lovecul/.test(w.url||'')||/lovecul/.test(w.url2||''));
+  if(currentGenre) list = list.filter(w=>(w.genres||[]).includes(currentGenre));
+  return sortList(list);
+}
+
+function offRate(w){ return (w.on_sale && w.list_price) ? (1 - w.price/w.list_price) : 0; }
+function sortList(list){
+  const a=[...list], s=sortBySite[currentSite];
+  if(s==='date_asc')      a.sort((x,y)=>(x.date||'').localeCompare(y.date||''));
+  else if(s==='price_asc')  a.sort((x,y)=>(x.price??1e9)-(y.price??1e9));
+  else if(s==='price_desc') a.sort((x,y)=>(y.price??-1)-(x.price??-1));
+  else if(s==='off_desc')   a.sort((x,y)=>offRate(y)-offRate(x));
+  else if(s==='review_desc')a.sort((x,y)=>(y.review_count||0)-(x.review_count||0));
+  else if(s==='circle')     a.sort((x,y)=>(x.circle||'').localeCompare(y.circle||'','ja'));
+  return a;  // 'new' は works.json の並び（予告先頭＋発売日降順）を維持
+}
+
+function renderWorks(f='all', reset=true){
+  if(reset){ currentFilter=f; displayCount=INIT; }
+
+  const list   = getFiltered(f);
+  const shown  = list.slice(0, displayCount);
+  const remain = list.length - displayCount;
+
+  const g = document.getElementById('works-grid');
+  if(!shown.length){
+    g.innerHTML='<div class="empty">該当する作品がありません</div>';
+    document.getElementById('works-more').style.display='none';
+    return;
+  }
+
+  g.innerHTML = shown.map(makeWorkCard).join('');
+
+  const moreWrap = document.getElementById('works-more');
+  const countEl  = document.getElementById('works-count');
+  if(remain > 0){
+    moreWrap.style.display='block';
+    countEl.textContent = `${shown.length} / ${list.length}件表示中`;
+  } else {
+    moreWrap.style.display='none';
+  }
+}
+
+function loadMoreWorks(){
+  displayCount += MORE;
+  renderWorks(currentFilter, false);
+}
+
+async function loadWorks(){
+  try{
+    const r=await fetch('https://raw.githubusercontent.com/AZ-anything/hashiba-rei-site/main/bl_works.json',{cache:'no-store'});
+    if(!r.ok)throw 0;
+    const d=await r.json();
+    allWorks=d.works||[];
+    if(d.updated_at){
+      const dt=new Date(d.updated_at);
+      // toLocaleStringでJSTに変換
+      const jst=new Date(dt.getTime()+9*60*60*1000);
+      document.getElementById('works-meta').textContent=
+        `${jst.getUTCFullYear()}/${jst.getUTCMonth()+1}/${jst.getUTCDate()} ${String(jst.getUTCHours()).padStart(2,'0')}:${String(jst.getUTCMinutes()).padStart(2,'0')} JST 更新`;
+    }
+  }catch(e){
+    allWorks=[];
+  }
+  renderPickup(allWorks);
+  renderWorks('all');
+  buildGenreTags();
+}
+
+// YouTube データ保持
+const ytData={videos:[],utatte:[],lives:[],shorts:[]};
+const YT_INITIAL_SHOW=12;
+let ytCurrentTab='videos';
+let ytShowAll=false;
+
+function makeYtCard(item){
+  const dt=new Date(item.published||item.snippet?.publishedAt);
+  const ds=`${dt.getFullYear()}/${dt.getMonth()+1}/${dt.getDate()}`;
+  const thumb=item.thumbnail||item.snippet?.thumbnails?.medium?.url||'';
+  const link=item.link||`https://www.youtube.com/watch?v=${item.id?.videoId||item.id}`;
+  const title=item.title||item.snippet?.title||'';
+  const membersBadge=item.members_only
+    ?`<span class="yt-members-badge"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>メンバー限定</span>`
+    :'';
+  return`<a class="yt-card" href="${link}" target="_blank" rel="noopener">
+    <div class="yt-thumb-wrap">
+      ${thumb?`<img class="yt-thumb" src="${thumb}" alt="${title}" loading="lazy">`:''}
+      <div class="yt-overlay"><div class="yt-play"><svg width="16" height="16" viewBox="0 0 24 24" fill="#333"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+    </div>
+    <div class="yt-body"><p class="yt-title">${title}</p><p class="yt-date">${ds}</p>${membersBadge}</div>
+  </a>`;
+}
+
+function renderYT(type){
+  const g=document.getElementById('yt-grid');
+  const list=ytData[type]||[];
+  ytCurrentTab=type;
+  ytShowAll=false;
+  document.querySelectorAll('.yt-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelector(`.yt-tab[data-yt="${type}"]`)?.classList.add('on');
+  if(!list.length){g.innerHTML='<div class="empty">動画がありません</div>';updateShowAllBtn();return;}
+  const show=list.slice(0,YT_INITIAL_SHOW);
+  g.innerHTML=show.map(makeYtCard).join('');
+  updateShowAllBtn();
+}
+
+function updateShowAllBtn(){
+  const wrap=document.getElementById('yt-show-all-wrap');
+  const list=ytData[ytCurrentTab]||[];
+  if(!ytShowAll&&list.length>YT_INITIAL_SHOW){
+    const rest=list.length-YT_INITIAL_SHOW;
+    wrap.innerHTML=`<button class="yt-show-all" onclick="showAllYT()">すべて表示（残り${rest}件）</button>`;
+  }else{
+    wrap.innerHTML='';
+  }
+}
+
+function showAllYT(){
+  const g=document.getElementById('yt-grid');
+  const list=ytData[ytCurrentTab]||[];
+  ytShowAll=true;
+  g.innerHTML=list.map(makeYtCard).join('');
+  updateShowAllBtn();
+}
+
+function updateTabCounts(){
+  document.querySelectorAll('.yt-tab').forEach(t=>{
+    const type=t.dataset.yt;
+    const count=(ytData[type]||[]).length;
+    const existing=t.querySelector('.yt-tab-count');
+    if(existing)existing.remove();
+    if(count>0){
+      const span=document.createElement('span');
+      span.className='yt-tab-count';
+      span.textContent=`(${count})`;
+      t.appendChild(span);
+    }
+  });
+}
+
+async function loadYT(){
+  const g=document.getElementById('yt-grid');
+  g.innerHTML='<div class="empty"><div class="dots"><span></span><span></span><span></span></div></div>';
+  try{
+    const r=await fetch('https://raw.githubusercontent.com/AZ-anything/hashiba-rei-site/main/youtube.json?_='+Date.now());
+    if(!r.ok)throw new Error('fetch failed');
+    const d=await r.json();
+    if(!d.items?.length)throw new Error('no items');
+
+    ytData.videos =d.items.filter(i=>i.tab==='videos');
+    ytData.utatte =d.items.filter(i=>i.tab==='utatte');
+    ytData.lives  =d.items.filter(i=>i.tab==='lives');
+    ytData.shorts =d.items.filter(i=>i.tab==='shorts');
+    updateTabCounts();
+    renderYT('videos');
+  }catch(e){
+    console.error('YouTube load error:',e);
+    g.innerHTML=`<div class="empty">動画の読み込みに失敗しました。<a href="https://www.youtube.com/channel/${YT_CH}" target="_blank" rel="noopener" style="color:var(--green)">YouTubeチャンネルはこちら</a></div>`;
+  }
+}
+
+document.querySelectorAll('.yt-tab').forEach(b=>{
+  b.addEventListener('click',()=>renderYT(b.dataset.yt));
+});
+/* ─── 検索 ─── */
+function highlightMatch(text, q){
+  if(!q) return text;
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if(idx===-1) return text;
+  return text.slice(0,idx)
+    + `<mark>${text.slice(idx,idx+q.length)}</mark>`
+    + text.slice(idx+q.length);
+}
+
+function siteName(url){
+  if(url.includes('lovecul.dmm.co.jp')) return 'らぶカル';
+  if(url.includes('dlsite.com')) return 'DLsite';
+  return 'ストア';
+}
+
+function priceBlock(w){
+  if(w.price==null) return '';
+  if(w.on_sale && w.list_price){
+    const off=Math.round((1-w.price/w.list_price)*100);
+    return `<p class="w-card-price"><span class="price-off">${off}%OFF</span><span class="price-now">¥${w.price.toLocaleString()}</span><span class="price-orig">¥${w.list_price.toLocaleString()}</span></p>`;
+  }
+  return `<p class="w-card-price"><span class="price-now">¥${w.price.toLocaleString()}</span></p>`;
+}
+
+function storeButtons(w, btnCls, wrapCls){
+  const links = [w.url, w.url2].filter(Boolean);
+  const label = u => links.length > 1 ? siteName(u) : siteName(u) + 'で見る';
+  return `<div class="${wrapCls}">` + links.map(u =>
+    `<a class="${btnCls}" href="${u}" target="_blank" rel="noopener">${label(u)}</a>`
+  ).join('') + `</div>`;
+}
+
+function makeWorkCard(w){
+  const imgHtml = w.cover
+    ? `<img class="w-card-img" src="${w.cover}" alt="${w.title}" loading="lazy"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+       <div class="w-card-ph" style="display:none">🎧</div>`
+    : `<div class="w-card-ph">🎧</div>`;
+  const priceHtml = priceBlock(w);
+  const ribbon = w.on_sale ? '<span class="sale-ribbon">SALE</span>' : '';
+  return `<div class="w-card">
+    ${ribbon}
+    ${imgHtml}
+    <div class="w-card-body">
+      <span class="badge ${stCls(w.status)}" style="margin-bottom:.38rem">${stLabel(w.status)}</span>
+      <p class="w-card-title">${w.title}</p>
+      <p class="w-card-circle">${w.circle}</p>
+      ${priceHtml}
+      ${storeButtons(w, 'w-card-btn', 'w-card-btns')}
+    </div>
+  </div>`;
+}
+
+function setupSearch(){
+  const input   = document.getElementById('search-input');
+  const clearBtn= document.getElementById('search-clear');
+  const suggest = document.getElementById('suggest-list');
+
+  function doSearch(){
+    const q = input.value.trim();
+    clearBtn.style.display = q ? 'block' : 'none';
+
+    if(!q){
+      suggest.style.display = 'none';
+      renderWorks(currentFilter, false);
+      return;
+    }
+
+    const qL = q.toLowerCase();
+    const hits = allWorks.filter(w=>
+      w.title.toLowerCase().includes(qL) ||
+      w.circle.toLowerCase().includes(qL) ||
+      (w.genres||[]).some(g=>g.toLowerCase().includes(qL))
+    );
+
+    // サジェストドロップダウン（最大8件）
+    if(hits.length){
+      suggest.innerHTML = hits.slice(0,8).map(w=>`
+        <a class="suggest-item" href="${w.url}" target="_blank" rel="noopener">
+          ${w.cover
+            ? `<img class="suggest-thumb" src="${w.cover}" alt="" loading="lazy" onerror="this.style.display='none'">`
+            : `<div class="suggest-ph">🎧</div>`}
+          <div style="min-width:0">
+            <p class="suggest-title">${highlightMatch(w.title, q)}</p>
+            <p class="suggest-circle">${w.circle}</p>
+          </div>
+        </a>`).join('');
+    } else {
+      suggest.innerHTML = '<div class="suggest-empty">該当する作品がありません</div>';
+    }
+    suggest.style.display = 'block';
+
+    // グリッドも絞り込み表示（ページネーションなし）
+    const g = document.getElementById('works-grid');
+    document.getElementById('works-more').style.display = 'none';
+    g.innerHTML = hits.length
+      ? hits.map(makeWorkCard).join('')
+      : '<div class="empty">該当する作品がありません</div>';
+  }
+
+  input.addEventListener('input', doSearch);
+
+  clearBtn.addEventListener('click', ()=>{
+    input.value = '';
+    clearBtn.style.display = 'none';
+    suggest.style.display = 'none';
+    renderWorks(currentFilter, false);
+  });
+
+  document.addEventListener('click', e=>{
+    if(!e.target.closest('.search-wrap')) suggest.style.display = 'none';
+  });
+
+  input.addEventListener('focus', ()=>{
+    if(input.value.trim()) suggest.style.display = 'block';
+  });
+}
+
+document.querySelectorAll('.fbtn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    currentGenre = '';
+    document.querySelectorAll('.genre-tag').forEach(x=>x.classList.remove('on'));
+    renderWorks(b.dataset.f, true);
+  });
+});
+document.querySelectorAll('.sbtn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.sbtn').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    currentSite=b.dataset.s;
+    const ss=document.getElementById('sort-select'); if(ss) ss.value=sortBySite[currentSite];
+    renderWorks(currentFilter, true);
+  });
+});
+{const ss=document.getElementById('sort-select'); if(ss) ss.addEventListener('change',()=>{sortBySite[currentSite]=ss.value; renderWorks(currentFilter, true);});}
+document.querySelectorAll('.reveal').forEach(el=>{
+  new IntersectionObserver(([e])=>{if(e.isIntersecting)e.target.classList.add('in');},{threshold:.08}).observe(el);
+});
+
+/* ─── 初期化 ─── */
+loadWorks();
+loadYT();
+setupSearch();
+</script>
+</body>
+</html>
