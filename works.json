@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-22T18:52:33.129221+00:00",
+  "updated_at": "2026-06-23T17:21:25.392304+00:00",
   "total": 169,
   "works": [
     {
@@ -35,7 +35,7 @@
       "genres": [
         "フタナリ"
       ],
-      "review_count": 4,
+      "review_count": 10,
       "price": 660,
       "list_price": 660,
       "on_sale": 0
@@ -65,7 +65,7 @@
       "price": 1309,
       "list_price": 1540,
       "on_sale": true,
-      "review_count": 7,
+      "review_count": 8,
       "review_average": 4.4
     },
     {
