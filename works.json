@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-12T16:08:16.785686+00:00",
+  "updated_at": "2026-07-14T16:35:46.190590+00:00",
   "total": 170,
   "works": [
     {
@@ -107,9 +107,9 @@
         "合意なし"
       ],
       "url2": "https://lovecul.dmm.co.jp/tl/-/detail/=/cid=d_774594/",
-      "price": 1430,
+      "price": 1287,
       "list_price": 1430,
-      "on_sale": false,
+      "on_sale": true,
       "review_count": 10,
       "review_average": 5.0
     },
