@@ -151,6 +151,47 @@ GitHub Actions から通るかは不明。ローカル（日本IP）では確実
 - works.jsonの `url` に加え、**重複販売作品は `url2` を設定すると両サイトのボタンが並ぶ**
 - ボタン表記は `siteName(url)` でURL判定（dlsite.com→DLsite / lovecul.dmm.co.jp→らぶカル / 他→ストア）
 
+## アフィリエイトリンク（2026-07-15追加）
+
+**works.json / bl_works.json は正規URLのまま保持し、表示時に `affiliate()` が組み立てる。**
+データを書き換えないので、check_releases.py / add_work.py の日次処理に影響しない。
+実装は `index.html` と `bl.html` の両方（同一内容）。
+
+| 対象 | 生成されるURL |
+|---|---|
+| DLsite 発売済み | `https://dlaf.jp/{区分}/dlaf/=/t/s/link/work/aid/reivox/id/{RJ|BJ}.html` |
+| らぶカル | `https://al.fanza.co.jp/?lurl={URLエンコードした正規URL}&af_id=hashibarei-990&ch=api` |
+| DLsite 予告(`/announce/`) | 変換しない（正規URLのまま） |
+
+- DLsiteのアフィリエイトIDは `reivox`、ドメインは **`dlaf.jp`**（`dlsite.com` ではない）
+- らぶカルのドメインは **`al.fanza.co.jp`**（`al.dmm.co.jp` ではない）
+- 区分は正規URLから引き継ぐ（`girls` / `girls-drama` / `bl` で動作確認済み）
+
+### ⚠️ 予告ページ(`/announce/`)をアフィリエイト化してはいけない
+
+変換すると DLsite は **200 を返しながら作品ページではなくカテゴリのトップへ飛ばす**。
+エラーにならないため気づけず、リンクが黙って壊れて成果も付かない。
+発売時に check_releases.py が url を `/work/` に書き換えるので、**自動でアフィリエイト化される**。
+（実績: 令和ちんぽ RJ01420614 が 2026-06-21 に announced→released で切り替わり、
+アフィリエイトリンクが正しく作品ページに着地することを確認済み）
+
+### らぶカルのアフィリエイトURLについて
+
+DMMアフィリエイトの管理画面にらぶカル用のリンク作成UIは無いが、**API が `affiliateURL` を返す**。
+`encodeURIComponent` で組み立てた文字列が API の返り値とバイト単位で一致することを確認済みのため、
+クライアント側で生成してよい（TL / BL 両方で検証済み）。
+
+### ⚠️ DMM Webサービスのクレジット表記
+
+DMM Webサービス提供のAPIを利用して作成したサイトにはクレジット表記が必要。
+**アフィリエイトリンクの有無に関わらず、API を使っている時点で該当する**
+（check_releases.py が毎日 API から価格・レビュー・ジャンルを取得し、サイトに表示している）。
+
+`index.html` / `bl.html` のフッター最下部に `.ft-credit` として設置済み:
+`Powered by <a href="https://affiliate.dmm.com/api/">DMM.com Webサービス</a>`
+
+`request.html` は API 由来のデータを表示していないため不要。
+
 ## サークル判定
 
 - はねしば（羽柴礼自身のサークル）の作品はサークル名で自動判定

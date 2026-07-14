@@ -199,6 +199,9 @@
     .ft-link{font-size:.73rem;letter-spacing:.1em;color:rgba(255,255,255,.45);transition:color var(--ease);}
     .ft-link:hover{color:rgba(255,255,255,.88);}
     .ft-copy{font-size:.68rem;letter-spacing:.07em;}
+    .ft-credit{font-size:.6rem;letter-spacing:.05em;color:rgba(255,255,255,.25);margin-top:.9rem;}
+    .ft-credit a{color:inherit;text-decoration:underline;text-underline-offset:2px;}
+    .ft-credit a:hover{color:rgba(255,255,255,.55);}
 
     .empty{text-align:center;padding:2.5rem;color:var(--text-muted);font-size:.83rem;grid-column:1/-1;}
     .dots{display:inline-flex;gap:4px;}
@@ -456,6 +459,7 @@
       <a class="ft-link" href="/request.html">ご依頼について</a>
     </div>
     <p class="ft-copy">© 2025 Hashiba Rei. All rights reserved.</p>
+    <p class="ft-credit">Powered by <a href="https://affiliate.dmm.com/api/" target="_blank" rel="noopener">DMM.com Webサービス</a></p>
   </div>
 </footer>
 
@@ -730,6 +734,22 @@ function siteName(url){
   return 'ストア';
 }
 
+const DLSITE_AID = 'reivox';
+const DMM_AF_ID  = 'hashibarei-990';
+
+// DLsiteは発売済み(/work/)ページのみアフィリエイト化する。
+// /announce/ の予告ページを変換すると、DLsiteは200を返しながら作品ではなく
+// カテゴリのトップページへ飛ばすため、リンクが黙って壊れる。
+// 発売時に check_releases.py が url を /work/ に書き換えるので自動で切り替わる。
+// らぶカルは DMM API の affiliateURL と同一形式を組み立てる
+// （API の返り値と encodeURIComponent の出力がバイト単位で一致することを確認済み）。
+function affiliate(url){
+  const m = url.match(/dlsite\.com\/([^/]+)\/work\/=\/product_id\/((?:RJ|BJ)\d+)\.html/);
+  if(m) return `https://dlaf.jp/${m[1]}/dlaf/=/t/s/link/work/aid/${DLSITE_AID}/id/${m[2]}.html`;
+  if(url.includes('lovecul.dmm.co.jp')) return `https://al.fanza.co.jp/?lurl=${encodeURIComponent(url)}&af_id=${DMM_AF_ID}&ch=api`;
+  return url;
+}
+
 function priceBlock(w){
   if(w.price==null) return '';
   if(w.on_sale && w.list_price){
@@ -743,7 +763,7 @@ function storeButtons(w, btnCls, wrapCls){
   const links = [w.url, w.url2].filter(Boolean);
   const label = u => links.length > 1 ? siteName(u) : siteName(u) + 'で見る';
   return `<div class="${wrapCls}">` + links.map(u =>
-    `<a class="${btnCls}" href="${u}" target="_blank" rel="noopener">${label(u)}</a>`
+    `<a class="${btnCls}" href="${affiliate(u)}" target="_blank" rel="noopener">${label(u)}</a>`
   ).join('') + `</div>`;
 }
 
