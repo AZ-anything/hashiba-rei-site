@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-15T11:44:25.908668+00:00",
+  "updated_at": "2026-07-15T16:42:27.029205+00:00",
   "total": 174,
   "works": [
     {
@@ -155,7 +155,7 @@
       "price": 1540,
       "list_price": 1540,
       "on_sale": false,
-      "review_count": 8,
+      "review_count": 10,
       "review_average": 4.4
     },
     {
@@ -353,9 +353,9 @@
       "status": "released",
       "release_period": "",
       "genres": [],
-      "price": 847,
+      "price": 1540,
       "list_price": 1540,
-      "on_sale": true,
+      "on_sale": false,
       "review_count": 5
     },
     {
@@ -534,9 +534,9 @@
         "超ひどい",
         "命令/無理矢理"
       ],
-      "price": 726,
+      "price": 1320,
       "list_price": 1320,
-      "on_sale": true,
+      "on_sale": false,
       "review_count": 8
     },
     {
