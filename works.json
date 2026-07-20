@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-17T16:34:11.741080+00:00",
+  "updated_at": "2026-07-20T16:42:19.282954+00:00",
   "total": 175,
   "works": [
     {
@@ -614,7 +614,7 @@
       "price": 825,
       "list_price": 1100,
       "on_sale": true,
-      "review_count": 1
+      "review_count": 2
     },
     {
       "title": "残響",
@@ -1467,9 +1467,9 @@
         "中出し"
       ],
       "url2": "https://lovecul.dmm.co.jp/tl/-/detail/=/cid=d_703413/",
-      "price": 704,
+      "price": 1760,
       "list_price": 1760,
-      "on_sale": true,
+      "on_sale": false,
       "review_count": 19
     },
     {
