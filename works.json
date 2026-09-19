@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-18T18:23:58.583185+00:00",
+  "updated_at": "2026-09-19T17:58:33.113083+00:00",
   "total": 176,
   "works": [
     {
@@ -540,9 +540,9 @@
         "溺愛",
         "中出し"
       ],
-      "price": 2090,
+      "price": 1672,
       "list_price": 2090,
-      "on_sale": false,
+      "on_sale": true,
       "review_count": 7
     },
     {
@@ -2379,9 +2379,9 @@
         "ラブラブ/あまあま",
         "歴史/時代物"
       ],
-      "price": 1650,
+      "price": 1155,
       "list_price": 1650,
-      "on_sale": false,
+      "on_sale": true,
       "review_count": 15
     },
     {
@@ -2740,7 +2740,7 @@
       "price": 88,
       "list_price": 440,
       "on_sale": true,
-      "review_count": 215
+      "review_count": 216
     },
     {
       "title": "服従哀歌 ~ stay close ~",
