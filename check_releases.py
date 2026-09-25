@@ -14,9 +14,13 @@ GitHub Actions から毎日 0:10 JST に実行。
   ・released作品の価格・レビュー件数を最新化
 """
 
-import os, requests, json, re, time
+import os, sys, requests, json, re, time
 from bs4 import BeautifulSoup
 from datetime import datetime, timezone
+
+# Windowsの画面(cp932)では絵文字を表示できず止まるため、出力をUTF-8に固定する
+sys.stdout.reconfigure(encoding="utf-8")
+sys.stderr.reconfigure(encoding="utf-8")
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 

@@ -18,6 +18,10 @@ from datetime import datetime, timezone
 import requests
 from bs4 import BeautifulSoup
 
+# Windowsの画面(cp932)では絵文字を表示できず止まるため、出力をUTF-8に固定する
+sys.stdout.reconfigure(encoding="utf-8")
+sys.stderr.reconfigure(encoding="utf-8")
+
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
 GIRLS_DOMAINS = ["girls", "girls-drama", "girls-touch", "girls-drama-touch", "maniax"]
