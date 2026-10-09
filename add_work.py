@@ -18,6 +18,8 @@ from datetime import datetime, timezone
 import requests
 from bs4 import BeautifulSoup
 
+from validate_works import validate
+
 # Windowsの画面(cp932)では絵文字を表示できず止まるため、出力をUTF-8に固定する
 sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
@@ -223,27 +225,6 @@ def route(url: str):
             return parse_lovecul(url, "digital_doujin_bl", "bl"), "bl_works.json", "BL"
         return parse_lovecul(url, "digital_doujin_tl", "tl"), "works.json", "乙女向け"
     raise ValueError(f"未対応のURLです: {url}")
-
-
-def validate(work: dict) -> list:
-    """取得結果の崩れを検出する。崩れたまま保存すると画面を見るまで気づけないため"""
-    problems = []
-    title = work.get("title", "")
-    if not title:
-        problems.append("タイトルが空")
-    if "予告作品" in title:
-        problems.append("タイトルに「予告作品」が残っている")
-    if re.search(r"\[[^\[\]]*\]\s*$", title):
-        problems.append("タイトル末尾に [サークル名] が残っている")
-    if "﻿" in title:
-        problems.append("タイトルに不可視文字(BOM)が入っている")
-    if not work.get("circle"):
-        problems.append("サークル名が空")
-    if not work.get("url"):
-        problems.append("URLが空")
-    if not work.get("cover"):
-        problems.append("カバー画像が空")
-    return problems
 
 
 def main():

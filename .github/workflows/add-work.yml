@@ -35,6 +35,9 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
 
+      - name: データ検査（崩れ・件数減少があれば止める）
+        run: python validate_works.py
+
       - name: 変更があればコミット・プッシュ
         run: |
           git config user.name  "github-actions[bot]"

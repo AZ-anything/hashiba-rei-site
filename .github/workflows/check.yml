@@ -28,6 +28,9 @@ jobs:
           DMM_AFFILIATE_ID: ${{ secrets.DMM_AFFILIATE_ID }}
         run: python check_releases.py
 
+      - name: データ検査（崩れ・件数減少があれば止める）
+        run: python validate_works.py
+
       - name: 変更があればコミット・プッシュ
         run: |
           git config user.name  "github-actions[bot]"
