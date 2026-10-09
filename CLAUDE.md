@@ -56,6 +56,12 @@ OneDrive / Box / Dropbox 等の同期フォルダ配下に clone してはいけ
 4. 承認後にGitHubへプッシュ
 5. 本番デプロイ
 
+**ドラフトの作り方（2026-10-10実証）**: このPCには Netlify CLI もトークンも無い。
+代わりに**ブランチを切って PR を作る**と、Netlify が `https://deploy-preview-<PR番号>--hashiba-rei.netlify.app`
+を自動で作る（スマホからも開ける）。承認後に PR をマージ＝本番。Netlify MCP の deploy-site は
+draft 指定が無く本番に出る恐れがあるので使わない。
+ローカル確認は内蔵ブラウザで `file:///<ReiVox>/index.html` を開けば足りる（データは GitHub main から読む）。
+
 **⚠️ 確認なしで本番デプロイは絶対禁止。** 過去にJS欠損のまま本番に出しかけた事故あり。
 **⚠️ Azの承認なしの本番デプロイも禁止**（2026-06-05ルール化）。
 
@@ -156,6 +162,15 @@ GitHub Actions から通るかは不明。ローカル（日本IP）では確実
 - ドメインは `girls`, `girls-drama`, `girls-touch`, `girls-drama-touch`, `maniax` を横断チェック
 - APIエンドポイント `product_id/{ID}.json` は404になる（使えない）
 - DLsiteは海外IPからでも取得可（らぶカルと違い年齢認証Cookieも不要）
+
+## 販売終了（2026-10-10追加）
+
+- `check_releases.py` が毎日、**DLsite検索に出ない released 作品だけ**作品ページを確かめ、
+  404 かつ `<title>` に「この作品は現在販売されていません」があれば、そのURLを `ended_urls` に入れる。
+  **作品は消さない**（出演記録として残す）。販売再開で自動的に外れる
+- `product.json` は販売終了後も `on_sale=1` を返すので**判定に使えない**（RJ01431374で実測）
+- 画面は `ended_urls` のストアのボタンだけ外し、全ストア終了なら灰色の「販売終了」を出す
+- らぶカルの販売終了は未対応（API未掲載＝予告段階と区別できないため）
 
 ## 作品カードのリンク仕様
 
