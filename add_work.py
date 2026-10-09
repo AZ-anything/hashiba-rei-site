@@ -65,11 +65,13 @@ def _dlsite_common(soup, url) -> dict:
     og_image = soup.find("meta", property="og:image")
     title, circle = "", ""
     if og_title:
-        tm = re.match(r"^(.*?)\s*\[(.*?)\]\s*\|", og_title["content"])
+        # 予告ページは「タイトル [サークル] 予告作品 | DLsite」の形になる
+        content = og_title["content"].replace("﻿", "")
+        tm = re.match(r"^(.*?)\s*\[([^\[\]]*)\]\s*(?:予告作品\s*)?\|", content)
         if tm:
             title, circle = tm.group(1).strip(), tm.group(2).strip()
         else:
-            title = og_title["content"].split("|")[0].strip()
+            title = content.split("|")[0].strip()
     return {"title": title, "circle": circle, "url": url,
             "cover": og_image["content"] if og_image else ""}
 
