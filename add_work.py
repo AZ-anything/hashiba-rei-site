@@ -225,6 +225,27 @@ def route(url: str):
     raise ValueError(f"未対応のURLです: {url}")
 
 
+def validate(work: dict) -> list:
+    """取得結果の崩れを検出する。崩れたまま保存すると画面を見るまで気づけないため"""
+    problems = []
+    title = work.get("title", "")
+    if not title:
+        problems.append("タイトルが空")
+    if "予告作品" in title:
+        problems.append("タイトルに「予告作品」が残っている")
+    if re.search(r"\[[^\[\]]*\]\s*$", title):
+        problems.append("タイトル末尾に [サークル名] が残っている")
+    if "﻿" in title:
+        problems.append("タイトルに不可視文字(BOM)が入っている")
+    if not work.get("circle"):
+        problems.append("サークル名が空")
+    if not work.get("url"):
+        problems.append("URLが空")
+    if not work.get("cover"):
+        problems.append("カバー画像が空")
+    return problems
+
+
 def main():
     if len(sys.argv) < 2:
         print("usage: python add_work.py <URL>")
@@ -235,6 +256,13 @@ def main():
     print(f"判別: {label} → {target}")
     print("取得結果:")
     print(json.dumps(work, ensure_ascii=False, indent=2))
+
+    problems = validate(work)
+    if problems:
+        print("❌ 取得結果が崩れているため追加を中止しました（works.json は変更していません）:")
+        for p in problems:
+            print(f"  - {p}")
+        sys.exit(1)
 
     with open(target, encoding="utf-8") as f:
         data = json.load(f)
