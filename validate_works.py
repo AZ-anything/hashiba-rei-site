@@ -42,6 +42,9 @@ def validate(work: dict) -> list:
     # 画面の stLabel() が知っている値だけ通す
     if work.get("status") not in ("released", "announced", "upcoming", "preorder"):
         problems.append(f"status が不正: {work.get('status')!r}")
+    for u in work.get("ended_urls", []):
+        if u not in (work.get("url"), work.get("url2")):
+            problems.append(f"ended_urls に url / url2 以外が入っている: {u}")
     return problems
 
 

@@ -12,6 +12,7 @@ GitHub Actions から毎日 0:10 JST に実行。
   ・発売検知時はDLsiteから正確な発売日・ジャンルを取得
   ・らぶカル作品（lovecul.dmm.co.jp）はDMMアフィリエイトAPIで発売チェック
   ・released作品の価格・レビュー件数を最新化
+  ・DLsiteで販売終了になった作品を ended_urls に記録（作品は消さない）
 """
 
 import os, sys, requests, json, re, time
@@ -298,12 +299,68 @@ def update_prices_reviews(works: list, cfg: dict) -> bool:
         counts = []
         if rj in dl: counts.append(dl[rj]["review_count"])
         if cid in dmm: counts.append(dmm[cid]["review_count"])
-        nrc = max(counts) if counts else 0
+        nrc = max(counts) if counts else w.get("review_count", 0)  # 検索に出ない作品は0で上書きしない
         if np is not None and (w.get("price") != np or w.get("list_price") != nlp):
             w["price"] = np; w["list_price"] = nlp
             w["on_sale"] = bool(nlp and np < nlp); changed = True
         if w.get("review_count") != nrc:
             w["review_count"] = nrc; changed = True
+    if dl and update_sale_ended(works, dl):
+        changed = True
+    return changed
+
+
+# ─── 販売終了の検知 ───────────────────────────────────────────
+
+ENDED_MARK = "この作品は現在販売されていません"
+
+
+def dlsite_sale_state(url: str):
+    """'ended' / 'live' / None（判定できない）。
+    販売終了の作品ページは 404 で、<title> が「エラー: この作品は現在販売されていません」になる
+    （2026-10-10 に RJ01431374 で実測）。存在しない作品は「該当作品がありません」で区別できる。
+    product.json は販売終了後も on_sale=1 を返すので判定に使えない（同日実測）"""
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=15)
+    except Exception as e:
+        print(f"  [販売状況取得エラー] {e}")
+        return None
+    if r.status_code == 200:
+        return "live"
+    t = re.search(r"<title>(.*?)</title>", r.text, re.S)
+    if r.status_code == 404 and t and ENDED_MARK in t.group(1):
+        return "ended"
+    return None
+
+
+def update_sale_ended(works: list, dl: dict) -> bool:
+    """DLsiteの販売終了を ended_urls に記録する（作品は消さない）。変更があればTrue
+    検索に出ない作品だけページを確かめるので、毎日数件のアクセスで済む。
+    販売が再開されたら ended_urls から外す"""
+    changed = False
+    for w in works:
+        if w.get("status") != "released":
+            continue
+        ended = list(w.get("ended_urls", []))
+        for u in [w.get("url", ""), w.get("url2", "")]:
+            m = re.search(r"dlsite\.com/.+/work/=/product_id/((?:RJ|BJ)\d+)", u)
+            if not m:
+                continue
+            state = "live" if m.group(1) in dl else dlsite_sale_state(u)
+            if state == "ended" and u not in ended:
+                print(f"  🚫 販売終了を検知: {w['title'][:35]}（{u}）")
+                ended.append(u)
+            elif state == "live" and u in ended:
+                print(f"  ↩️ 販売再開を検知: {w['title'][:35]}（{u}）")
+                ended.remove(u)
+            if m.group(1) not in dl:
+                time.sleep(1)
+        if ended != w.get("ended_urls", []):
+            if ended:
+                w["ended_urls"] = ended
+            else:
+                w.pop("ended_urls", None)
+            changed = True
     return changed
 
 
