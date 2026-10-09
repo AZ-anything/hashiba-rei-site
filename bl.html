@@ -766,7 +766,7 @@ function isEnded(w){ return !!(w.ended_urls && w.ended_urls.length) && liveLinks
 
 function storeButtons(w, btnCls, wrapCls){
   const links = liveLinks(w);
-  if(!links.length) return `<div class="${wrapCls}"><span class="w-card-ended">販売終了しました</span></div>`;
+  if(!links.length) return `<div class="${wrapCls}"><span class="w-card-ended">販売終了</span></div>`;
   const label = u => links.length > 1 ? siteName(u) : siteName(u) + 'で見る';
   return `<div class="${wrapCls}">` + links.map(u =>
     `<a class="${btnCls}" href="${affiliate(u)}" target="_blank" rel="noopener">${label(u)}</a>`
