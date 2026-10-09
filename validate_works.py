@@ -39,7 +39,8 @@ def validate(work: dict) -> list:
         problems.append("URLが空")
     if not work.get("cover"):
         problems.append("カバー画像が空")
-    if work.get("status") not in ("released", "announced"):
+    # 画面の stLabel() が知っている値だけ通す
+    if work.get("status") not in ("released", "announced", "upcoming", "preorder"):
         problems.append(f"status が不正: {work.get('status')!r}")
     return problems
 
